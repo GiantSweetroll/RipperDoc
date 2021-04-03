@@ -27,3 +27,7 @@ const BoxDecoration decorationWhiteBox = BoxDecoration(
     fit: BoxFit.cover,
   ),
 );
+const InputDecoration inputTextDecoration = InputDecoration(
+  hintText: "",
+  labelText: "",
+);

@@ -16,7 +16,9 @@ class PhotoScreen extends StatefulWidget {
 class _PhotoScreenState extends State<PhotoScreen> {
   //Fields
   PickedFile imageFile;
-  String midText = "Upload an Image", buttonText = "SEND";
+  String instructionText = "Upload an Image", buttonText = "SEND";
+  final _formKey = GlobalKey<FormState>();
+  String logoText;
 
   //Private methods
   void _showLoading(BuildContext context) {
@@ -87,18 +89,16 @@ class _PhotoScreenState extends State<PhotoScreen> {
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-            child: RawMaterialButton(
-              // fillColor: Colors.grey[200],
-              // shape: RoundedRectangleBorder(),
-              onPressed: () async {
-                await this._pickImage();
-                this.setState(() {});
-              },
-              child: Icon(
-                Icons.file_upload,
-                size: 90,
-              ),
+          RawMaterialButton(
+            // fillColor: Colors.grey[200],
+            // shape: RoundedRectangleBorder(),
+            onPressed: () async {
+              await this._pickImage();
+              this.setState(() {});
+            },
+            child: Icon(
+              Icons.file_upload,
+              size: 90,
             ),
           ),
         ],
@@ -136,57 +136,61 @@ class _PhotoScreenState extends State<PhotoScreen> {
     return Scaffold(
       body: SafeArea(
         child: Container(
-          padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
           // color: colorAppBase,
           decoration: decorationAppBase,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Expanded(
-                flex: 3,
-                child: Container(
-                  padding: EdgeInsets.all(20.0),
-                  child: Container(
-                    color: this.imageFile == null
-                        ? Color.fromRGBO(255, 255, 255, 0.5)
-                        : Colors.transparent,
-                    child: this.imageFile == null ?  this._createUploadImageWidget(): this._showImageWidget(),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              Flexible(
-                flex: 2,
-                child: Container(
-                  decoration: decorationWhiteBox,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 50.0,
-                      ),
-                      Flexible(
-                        flex: 1,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            this.midText,
-                            style: TextStyle(
-                              fontSize: 30,
-                              color: Colors.black,
-                            ),
-                          ),
+          child: Form(
+            key: this._formKey,
+            child: Center(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        this.instructionText,
+                        style: TextStyle(
+                          fontSize: 30,
+                          color: Colors.black,
                         ),
                       ),
-                      SizedBox(
-                        height: 10.0,
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(20.0),
+                      child: Container(
+                        color: this.imageFile == null
+                            ? Color.fromRGBO(255, 255, 255, 0.5)
+                            : Colors.transparent,
+                        child: this.imageFile == null ?  this._createUploadImageWidget(): this._showImageWidget(),
                       ),
-                      Flexible(
-                        flex: 1,
-                        child: ElevatedButton(
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(50, 0, 50, 30),
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                            hintText: "Enter logo in image"
+                        ),
+                        validator: (val) => val.trim().isEmpty ? 'Field cannot be empty' : null,
+                        onChanged: (val) {
+                          this.setState(() {
+                            this.logoText = val;
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
                           onPressed: () async {
                             //TODO: Upload to firebase stoage
                           },
@@ -201,15 +205,15 @@ class _PhotoScreenState extends State<PhotoScreen> {
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
