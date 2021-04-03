@@ -1,0 +1,1 @@
+root, L:\For Machine Learning\Logo Recognition\Flickr32_Plus\images
