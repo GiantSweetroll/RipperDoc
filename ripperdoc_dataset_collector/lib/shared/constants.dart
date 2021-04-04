@@ -19,14 +19,12 @@ const BoxDecoration decorationAppBase = BoxDecoration(
       colorAppBase,
     ]
   ),
-);
-
-const BoxDecoration decorationWhiteBox = BoxDecoration(
   image: DecorationImage(
-    image: AssetImage("assets/mainmenu_whitebox.png"),
-    fit: BoxFit.cover,
+    image: AssetImage("assets/bg1.jpg"),
+    fit: BoxFit.fill,
   ),
 );
+
 const InputDecoration inputTextDecoration = InputDecoration(
   hintText: "",
   labelText: "",

@@ -4,6 +4,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import "package:flutter/material.dart";
 import 'package:image_picker/image_picker.dart';
+import 'package:ripperdoc_dataset_collector/services/firebase_storage.dart';
 import 'package:ripperdoc_dataset_collector/services/image_picker.dart';
 import 'package:ripperdoc_dataset_collector/shared/constants.dart';
 import 'package:ripperdoc_dataset_collector/shared/loading.dart';
@@ -18,9 +19,20 @@ class _PhotoScreenState extends State<PhotoScreen> {
   PickedFile imageFile;
   String instructionText = "Upload an Image", buttonText = "SEND";
   final _formKey = GlobalKey<FormState>();
-  String logoText;
+  TextEditingController textEditingController = TextEditingController();
+  String _error = "";
+  final double uploadAreaSize = 300;
+  StorageServices storageServices = StorageServices();
 
   //Private methods
+  void resetFields() {
+    this.setState(() {
+      this._error = "";
+      this.textEditingController.text = "";
+      this.imageFile = null;
+    });
+  }
+
   void _showLoading(BuildContext context) {
     showDialog(
         context: context,
@@ -86,21 +98,22 @@ class _PhotoScreenState extends State<PhotoScreen> {
       dashPattern: [6, 3, 6, 3],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          RawMaterialButton(
-            // fillColor: Colors.grey[200],
-            // shape: RoundedRectangleBorder(),
-            onPressed: () async {
-              await this._pickImage();
-              this.setState(() {});
-            },
-            child: Icon(
-              Icons.file_upload,
-              size: 90,
+          Expanded(
+            child: RawMaterialButton(
+              // fillColor: Colors.grey[200],
+              // shape: RoundedRectangleBorder(),
+              onPressed: () async {
+                await this._pickImage();
+                this.setState(() {});
+              },
+              child: Icon(
+                Icons.file_upload,
+                size: 90,
+              ),
             ),
-          ),
+          )
         ],
       ),
     );
@@ -132,6 +145,12 @@ class _PhotoScreenState extends State<PhotoScreen> {
 
   //Overridden Methods
   @override
+  void dispose() {
+    this.textEditingController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -161,6 +180,8 @@ class _PhotoScreenState extends State<PhotoScreen> {
                     Container(
                       padding: EdgeInsets.all(20.0),
                       child: Container(
+                        height: this.uploadAreaSize,
+                        width: this.uploadAreaSize,
                         color: this.imageFile == null
                             ? Color.fromRGBO(255, 255, 255, 0.5)
                             : Colors.transparent,
@@ -174,14 +195,24 @@ class _PhotoScreenState extends State<PhotoScreen> {
                       padding: const EdgeInsets.fromLTRB(50, 0, 50, 30),
                       child: TextFormField(
                         decoration: InputDecoration(
-                            hintText: "Enter logo in image"
+                          hintText: "Enter logo",
+                          hintStyle: TextStyle(
+                            color: Colors.white,
+                          ),
+                          fillColor: Colors.black45,
+                          filled: true,
                         ),
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                        controller: this.textEditingController,
                         validator: (val) => val.trim().isEmpty ? 'Field cannot be empty' : null,
-                        onChanged: (val) {
-                          this.setState(() {
-                            this.logoText = val;
-                          });
-                        },
+                      ),
+                    ),
+                    Center(
+                      child: Text(
+                        this._error,
+                        style: TextStyle(color: Colors.red),
                       ),
                     ),
                     SizedBox(
@@ -191,8 +222,49 @@ class _PhotoScreenState extends State<PhotoScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ElevatedButton(
+                          onPressed: this.resetFields,
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.red)
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10.0, vertical: 8.0),
+                            child: Text(
+                              "RESET",
+                              style: TextStyle(
+                                fontSize: 30,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 20,),
+                        ElevatedButton(
                           onPressed: () async {
-                            //TODO: Upload to firebase stoage
+                            // Validate input
+                            if (this.imageFile != null && this._formKey.currentState.validate()) {
+                              this.setState(() {
+                                this._error = "";
+                              });
+                              this._showLoading(context);
+                              // Upload to firebase storage
+                              File f = File(this.imageFile.path);
+                              // File f = File.fromRawPath(await this.imageFile.readAsBytes());
+                              String url = await storageServices.uploadFile(f, this.textEditingController.text);
+                              if (url.isEmpty) {
+                                // Show error
+                                this.setState(() {
+                                  this._error = "Unable to send image due to an error";
+                                });
+                              } else {
+                                // Reset fields
+                                this.resetFields();
+                              }
+                              Navigator.pop(context);
+                            } else {
+                              this.setState(() {
+                                this._error = "Please upload a photo and fill in the text field";
+                              });
+                            }
                           },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
