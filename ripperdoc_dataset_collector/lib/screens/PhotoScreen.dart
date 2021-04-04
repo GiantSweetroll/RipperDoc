@@ -4,6 +4,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import "package:flutter/material.dart";
 import 'package:image_picker/image_picker.dart';
+import 'package:package_info/package_info.dart';
 import 'package:ripperdoc_dataset_collector/services/firebase_storage.dart';
 import 'package:ripperdoc_dataset_collector/services/image_picker.dart';
 import 'package:ripperdoc_dataset_collector/shared/constants.dart';
@@ -23,8 +24,14 @@ class _PhotoScreenState extends State<PhotoScreen> {
   String _error = "";
   final double uploadAreaSize = 300;
   StorageServices storageServices = StorageServices();
+  final Color uploadImageBoxColor = Colors.black45;
+  PackageInfo packageInfo;
 
   //Private methods
+  void initPackageInfo() async {
+    this.packageInfo = await PackageInfo.fromPlatform();
+  }
+
   void resetFields() {
     this.setState(() {
       this._error = "";
@@ -35,13 +42,68 @@ class _PhotoScreenState extends State<PhotoScreen> {
 
   void _showLoading(BuildContext context) {
     showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return Loading(
-            transparent: true,
-          );
-        });
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Loading(
+          transparent: true,
+        );
+      }
+    );
+  }
+
+  void _showInstructionsPage(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            "App Info",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              children: [
+                Text(
+                  "RipperDoc Collector is an app used to collect images to be used "
+                      "in training the neural network AI for logo recognition,"
+                      " particularly logos of tech companies.\n",
+                  softWrap: true,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                      "How to Use:",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Text(
+                  "Upload a photo of an item with the logo visible (it can be in "
+                      "any orientation). Then enter what logo it is in the text field"
+                      " under it. Finish by hitting the SEND button.\n"
+                ),
+                Text(
+                  "By using this app you agree and provide full consent for the RipperDoc team to use your"
+                      " submitted images in anyway we see fit. \n\nThank you.\n\n"
+                      "Running version: ${this.packageInfo.version}"
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                "OK",
+              ),
+            ),
+          ],
+        );
+      }
+    );
   }
 
   Future<void> _pickImage() async {
@@ -110,6 +172,7 @@ class _PhotoScreenState extends State<PhotoScreen> {
               },
               child: Icon(
                 Icons.file_upload,
+                color: Colors.white,
                 size: 90,
               ),
             ),
@@ -127,7 +190,7 @@ class _PhotoScreenState extends State<PhotoScreen> {
       },
       child: Card(
         // elevation: 2.0,
-        color: Color.fromRGBO(255, 255, 255, 0.5),
+        color: this.uploadImageBoxColor,
         shadowColor: Colors.transparent,
         child: Container(
           padding: EdgeInsets.all(5.0),
@@ -145,6 +208,12 @@ class _PhotoScreenState extends State<PhotoScreen> {
 
   //Overridden Methods
   @override
+  void initState() {
+    super.initState();
+    this.initPackageInfo();
+  }
+
+  @override
   void dispose() {
     this.textEditingController.dispose();
     super.dispose();
@@ -153,6 +222,24 @@ class _PhotoScreenState extends State<PhotoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.grey[900],
+        title: Text(
+          this.instructionText,
+          style: TextStyle(
+            // fontSize: 30,
+            color: Colors.white,
+          ),
+        ),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.help_outline),
+              onPressed: () {
+                this._showInstructionsPage(context);
+              },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Container(
           // color: colorAppBase,
@@ -167,23 +254,13 @@ class _PhotoScreenState extends State<PhotoScreen> {
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        this.instructionText,
-                        style: TextStyle(
-                          fontSize: 30,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
                     Container(
                       padding: EdgeInsets.all(20.0),
                       child: Container(
                         height: this.uploadAreaSize,
                         width: this.uploadAreaSize,
                         color: this.imageFile == null
-                            ? Color.fromRGBO(255, 255, 255, 0.5)
+                            ? this.uploadImageBoxColor
                             : Colors.transparent,
                         child: this.imageFile == null ?  this._createUploadImageWidget(): this._showImageWidget(),
                       ),
