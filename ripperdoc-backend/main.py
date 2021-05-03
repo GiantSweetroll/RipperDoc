@@ -20,7 +20,7 @@ model = api.model("Image Model",
 
 ai_results = {}     # Dictionary to store the output of the AI
 
-@name_space.route("/<int:id>")
+@name_space.route("/<string:id>")
 class Home(Resource):
     @api.doc(responses={ 200: 'OK', 400: 'Invalid Argument', 500: 'Mapping Key Error' }, 
 			 params={ 'id': 'Specify the user id according to firebase id' })
