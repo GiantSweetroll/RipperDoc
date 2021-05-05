@@ -1,5 +1,6 @@
 from flask import Flask, request
 from flask_restx import Resource, Api, fields
+from neural_network import NeuralNetwork
 
 app = Flask(__name__)
 api = Api(app = app,
@@ -52,5 +53,12 @@ class Home(Resource):
         except Exception as e:
             name_space.abort(400, e.__doc__, status = "Could not retrieve information", statusCode = "400")
 
+def train_ai():
+    nn: NeuralNetwork = NeuralNetwork()
+    nn.train()
+    nn.save('test')
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)
+    train_ai()

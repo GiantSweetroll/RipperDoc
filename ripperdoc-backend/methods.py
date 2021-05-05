@@ -8,10 +8,10 @@ def __convert_data_map_to_lists(data_map:{}):
     """Converts the data dictionary to a numpy array of the labels (keys as integers) and a numpy array of the images (used to insert into neural net model)"""
     raw_images:[] = []
     image_labels:[] = []
-    for character in data_map:
-        for image in data_map[character]:
+    for label in data_map:
+        for image in data_map[label]:
             raw_images.append(image)
-            image_labels.append(character)
+            image_labels.append(label)
     
     return raw_images, numpy.array(image_labels)
 
@@ -29,13 +29,14 @@ def __resize_images(images, width:int = constants.image_width, height:int = cons
 
 def __convert_to_numpy_arr(images, width, height, color_channels):
     """Method for converting the list of images as a numpy array fit for neural network input"""
+    arr = numpy.array(images)
     array = numpy.zeros((len(images), width, height, color_channels))
     for i in range(len(images)):
         array[i,:,:,:] = images[i]
     
     return array
 
-def __shape_image_for_2d_mlp_input(images, width:int = constants.image_width, height:int = constants.image_height, color_channels:int=3):
+def __shape_image_for_2d_mlp_input(images, width:int = constants.image_width, height:int = constants.image_height, color_channels:int = constants.color_channels):
     """A method to reshape the images to be ready for neural net input"""
     #Color channels is the amount of possible colors -> grayscale = 1, colored = 3
     
@@ -56,36 +57,28 @@ def __convert_labels_to_one_hot(labels, categories:int):
     return tensorflow.keras.utils.to_categorical(new_labels, categories)
 
 def __convert_labels_to_index_correspondence(labels):
-    """Method to convert the characters of the sorted labels to correspond to the index of the char_list in constants"""
+    """Method to convert the characters of the sorted labels to correspond to the index of the labels in constants"""
     new_labels:[] = []
     i = -1
-    current_char = ""
-    prev_char = ""
+    current_brand = ""
+    prev_brand = ""
     for a in range(len(labels)):
-        current_char = labels[a]
-        if current_char != prev_char:
+        current_brand = labels[a]
+        if current_brand != prev_brand:
             i+=1
-        prev_char = labels[a]
+        prev_brand = labels[a]
         new_labels.append(str(i))
     return new_labels
 
-def __prepare_images_for_mlp_input(images,
-                                 width:int = image_width,
-                                 height:int = image_height,
-                                 color_channels:() = color_channels):
-    """Prepares the image for neural network input compatible"""
-    images = __resize_images(images, width, height)   #Resize the images to a uniform size
-    images = __convert_to_numpy_arr(images, width, height, color_channels)    #Convert the list to a numpy array
-    images = __shape_image_for_2d_mlp_input(images, width, height, color_channels)    #Convert image_array according to keras specification (color channels first or last), and normalize the images to be between 0 and 1
-    return images
-
-def get_image_and_label_for_mlp_input(image_map:{}, width:int = image_width, height:int = image_height, color_channels = color_channels):
+def get_image_and_label_for_mlp_input(image_map:{}, width:int = constants.image_width, height:int = constants.image_height, color_channels = constants.color_channels):
     """Method to automatically format input image dictionary to be usable for neural network input. Method returns the formatted image as 4D numpy list and the associated labels"""
-    images = image_map
-    
-    image_list, image_labels = __convert_data_map_to_lists(images)    #Convert the dictionary to a list, and convert the keys to a list as well that matches the size of the image list
-    
-    image_list = __prepare_images_for_mlp_input(image_list, width, height, color_channels)
+
+    image_list, image_labels = __convert_data_map_to_lists(image_map)    #Convert the dictionary to a list, and convert the keys to a list as well that matches the size of the image list
+
+    # Prepare the images and format them to be compatible with the given neural network model
+    image_list = __resize_images(image_list, width, height)   #Resize the images to a uniform size
+    image_list = __convert_to_numpy_arr(image_list, width, height, color_channels)    #Convert the list to a numpy array
+    image_list = __shape_image_for_2d_mlp_input(image_list, width, height, color_channels)    #Convert image_array according to keras specification (color channels first or last), and normalize the images to be between 0 and 1
     
     image_labels = __convert_labels_to_one_hot(image_labels, len(constants.labels))    #Convert the labels to one-hot format for neural network classification
     

@@ -22,12 +22,13 @@ def load_training_images(source:constants.Dataset = constants.Dataset.Flickr27) 
         for i in df.index:
             image_file: str = df.loc[i][0]      # Image name
             label: str =  df.loc[i][1]          # Image label (what logo it is)
+            image = load_image(constants.flickr_27_images_folder + image_file)      # Load the image into memory
             
             # Check if label exists in dictionary
             if images.get(label) != None:
-                images[label].append(image_file)
+                images[label].append(image)
             else:
-                images[label] = [image_file]
+                images[label] = [image]
     
     return images
 
