@@ -48,10 +48,10 @@ class NeuralNetwork():
 
         #Load training and test images
         print('Loading training images....')
-        train_images, train_labels = methods.get_image_and_label_for_mlp_input(file_operations.load_training_images(source= dataset), width, height, color_channels)
+        train_images, train_labels = methods.get_image_and_label_for_mlp_input(file_operations.load_training_images(source = dataset), width, height, color_channels)
         print('Training images loaded.')
         print('Loading test images...')
-        test_images, test_labels = methods.get_image_and_label_for_mlp_input(file_operations.load_test_images(dataset = dataset), width, height, color_channels)
+        test_images, test_labels = methods.get_image_and_label_for_mlp_input(file_operations.load_test_images(source = dataset), width, height, color_channels)
         print('Test images loaded.')
         
         # Train the neural network

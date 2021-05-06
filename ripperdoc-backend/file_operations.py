@@ -5,7 +5,7 @@ import constants
 
 def load_image(filename):
     image = cv2.imread(filename)      # Read image file
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert from BGR to RGB Format
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  # Convert from BGR to grayscale
     return image
 
 def load_training_images(source:constants.Dataset = constants.Dataset.Flickr27) -> dict:
@@ -44,11 +44,12 @@ def load_test_images(source:constants.Dataset = constants.Dataset.Flickr27):
         for i in df.index:
             image_file: str = df.loc[i][0]      # Image name
             label: str =  df.loc[i][1]          # Image label (what logo it is)
+            image = load_image(constants.flickr_27_images_folder + image_file)      # Load the image into memory
             
             # Check if label exists in dictionary
             if images.get(label) != None:
-                images[label].append(image_file)
+                images[label].append(image)
             else:
-                images[label] = [image_file]
+                images[label] = [image]
 
     return images

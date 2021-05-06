@@ -1,7 +1,7 @@
 from cv2 import cv2
 import matplotlib.pyplot as plt
 import numpy
-import tensorflow
+import tensorflow as tf
 import constants
 
 def __convert_data_map_to_lists(data_map:{}):
@@ -30,9 +30,13 @@ def __resize_images(images, width:int = constants.image_width, height:int = cons
 def __convert_to_numpy_arr(images, width, height, color_channels):
     """Method for converting the list of images as a numpy array fit for neural network input"""
     arr = numpy.array(images)
-    array = numpy.zeros((len(images), width, height, color_channels))
-    for i in range(len(images)):
-        array[i,:,:,:] = images[i]
+    array = numpy.zeros((len(images), width, height, color_channels)) if color_channels != 1 else numpy.zeros((len(images), width, height))
+    if color_channels != 1:
+        for i in range(len(images)):
+            array[i,:,:,:] = images[i]
+    else:
+        for i in range(len(images)):
+            array[i,:,:] = images[i]
     
     return array
 
@@ -41,7 +45,7 @@ def __shape_image_for_2d_mlp_input(images, width:int = constants.image_width, he
     #Color channels is the amount of possible colors -> grayscale = 1, colored = 3
     
     #Sometimes Keras puts color channels first before width and height, so we need to check for that
-    if tensorflow.keras.backend.image_data_format() == 'channels_first':
+    if tf.keras.backend.image_data_format() == 'channels_first':
         reshaped_images = images.reshape(images.shape[0], color_channels, width, height)
     else:
         reshaped_images = images.reshape(images.shape[0], width, height, color_channels)
@@ -54,7 +58,7 @@ def __shape_image_for_2d_mlp_input(images, width:int = constants.image_width, he
 def __convert_labels_to_one_hot(labels, categories:int):
     """Convert the labels to one-hot format (so that we know what character it is)"""
     new_labels:[] = __convert_labels_to_index_correspondence(labels)
-    return tensorflow.keras.utils.to_categorical(new_labels, categories)
+    return tf.keras.utils.to_categorical(new_labels, categories)
 
 def __convert_labels_to_index_correspondence(labels):
     """Method to convert the characters of the sorted labels to correspond to the index of the labels in constants"""
