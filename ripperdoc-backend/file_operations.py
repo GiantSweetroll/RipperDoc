@@ -5,7 +5,8 @@ import constants
 
 def load_image(filename):
     image = cv2.imread(filename)      # Read image file
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  # Convert from BGR to grayscale
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert from BGR to RGB
+    # image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  # Convert from BGR to grayscale
     return image
 
 def load_training_images(source:constants.Dataset = constants.Dataset.Flickr27) -> dict:

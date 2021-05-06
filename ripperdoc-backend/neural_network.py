@@ -9,6 +9,7 @@ class NeuralNetwork():
     def __init__(self, model = None):
         """A class to represent the neural network object"""
         if model == None:
+            # Use Xception model
             model = tf.keras.applications.Xception(include_top=True, 
                 weights=None, 
                 input_tensor=None,
@@ -17,6 +18,7 @@ class NeuralNetwork():
                 classes=len(constants.labels),
                 classifier_activation='softmax'
             )
+            model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])  # Compile the model
         self.__model = model
     
     #Setters and Getters

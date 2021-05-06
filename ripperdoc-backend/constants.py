@@ -2,7 +2,7 @@ import enum
 
 image_width = 299
 image_height = 299
-color_channels = 1
+color_channels = 3
 
 labels:[] = ["Apple", "HP", "Google", "Intel"]
 
