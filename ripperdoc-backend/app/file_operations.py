@@ -1,8 +1,7 @@
-from PIL import Image
+
 import base64
 import cv2
 import glob
-import io
 import numpy as np
 import pandas as pd
 import constants
