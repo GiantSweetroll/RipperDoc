@@ -78,6 +78,11 @@ class NeuralNetwork():
         
     def predict(self, image, show_pred_graph:bool = False) -> str:
         """Method to predict what character is the image, returns the image."""
+
+        # Format image input to fit model
+        temp = methods.prepare_images_for_mlp_input([image])
+        image = temp[0].reshape(1, constants.image_width, constants.image_height, constants.color_channels)
+
         #If show_pred_graph = True, it will draw the image and the prediction in a matplotlib graph
         prediction = self.get_model().predict(image)
         prediction_argmax = prediction.argmax()

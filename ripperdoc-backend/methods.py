@@ -74,16 +74,23 @@ def __convert_labels_to_index_correspondence(labels):
         new_labels.append(str(i))
     return new_labels
 
+def prepare_images_for_mlp_input(images, 
+                                    width:int = constants.image_width,
+                                    height:int = constants.image_height,
+                                    color_channels = constnats.color_channels):
+    # Prepare the images and format them to be compatible with the given neural network model
+    images = __resize_images(images, width, height)   #Resize the images to a uniform size
+    images = __convert_to_numpy_arr(images, width, height, color_channels)    #Convert the list to a numpy array
+    images = __shape_image_for_2d_mlp_input(images, width, height, color_channels)    #Convert image_array according to keras specification (color channels first or last), and normalize the images to be between 0 and 1
+    return images
+
 def get_image_and_label_for_mlp_input(image_map:{}, width:int = constants.image_width, height:int = constants.image_height, color_channels = constants.color_channels):
     """Method to automatically format input image dictionary to be usable for neural network input. Method returns the formatted image as 4D numpy list and the associated labels"""
 
     image_list, image_labels = __convert_data_map_to_lists(image_map)    #Convert the dictionary to a list, and convert the keys to a list as well that matches the size of the image list
 
-    # Prepare the images and format them to be compatible with the given neural network model
-    image_list = __resize_images(image_list, width, height)   #Resize the images to a uniform size
-    image_list = __convert_to_numpy_arr(image_list, width, height, color_channels)    #Convert the list to a numpy array
-    image_list = __shape_image_for_2d_mlp_input(image_list, width, height, color_channels)    #Convert image_array according to keras specification (color channels first or last), and normalize the images to be between 0 and 1
-    
+    image_list = prepare_images_for_mlp_input(image_list)   # Prepare the images and format them to be compatible with the given neural network model
+
     image_labels = __convert_labels_to_one_hot(image_labels, len(constants.labels))    #Convert the labels to one-hot format for neural network classification
     
     return image_list, image_labels
@@ -99,3 +106,9 @@ def show_prediction_graph_with_label(image, prediction:str, label:str):
     plt.title("Prediction: " + prediction + " Label: " + label)
     plt.imshow(image, cmap="gray")
     plt.show()
+
+def read_image_from_bytes(bytes_str:str):
+    """ Read image from bytes string"""
+    nparr = numpy.frombuffer(bytes_str, dtype = numpy.uint8)
+    img = cv2.imdecode(nparr, cv2.CV_LOAD_IMAGE_COLOR)
+    return img

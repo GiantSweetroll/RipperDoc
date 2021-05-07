@@ -2,6 +2,12 @@ from flask import Flask, request
 from flask_restx import Resource, Api, fields
 from neural_network import NeuralNetwork
 
+import file_operations as io
+import methods
+
+ai_results = {}     # Dictionary to store the output of the AI
+ai: NeuralNetwork = None    # The AI model
+
 app = Flask(__name__)
 api = Api(app = app,
             version = "1.0",
@@ -18,8 +24,6 @@ model = api.model("Image Model",
         help = "Image cannot be blank")
     }
 )
-
-ai_results = {}     # Dictionary to store the output of the AI
 
 @name_space.route("/<string:id>")
 class Home(Resource):
@@ -42,8 +46,13 @@ class Home(Resource):
     @api.expect(model)
     def post(self, id):
         try:
-            # TODO: Run AI here with input from request.json["image"]
-            ai_results[id] = request.json["image"]      # TODO: Replace with AI output
+            image = None
+            try:
+                image = methods.read_image_from_bytes(request.json["image"])
+            except Exception as e:
+                name_space.abort(400, e.__doc__, status = "Error in reading image file", statusCode = "400")
+
+            ai_results[id] = ai.predict(image)
             return {
                 "status" : "Image uploaded",
                 "result" : ai_results[id]
@@ -55,10 +64,17 @@ class Home(Resource):
 
 def train_ai():
     nn: NeuralNetwork = NeuralNetwork()
-    nn.train()
+    nn.train(batch_size=1)
     nn.save('test')
 
 
 if __name__ == '__main__':
-    # app.run(debug=True)
-    train_ai()
+
+    # Load AI
+    print('Loading AI...')
+    ai = NeuralNetwork(model=io.load_model('ai/test.h'))
+    print('AI loaded successfully')
+
+    # Start flask server
+    app.run(debug=True)
+    # train_ai()
