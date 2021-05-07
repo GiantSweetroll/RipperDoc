@@ -23,7 +23,7 @@ name_space = api.namespace('api-backend', description='Manage RipperDoc API')   
 # Model for input from front-end
 model = api.model("Image Model",
     {"image" : fields.String(required = True,
-        description = "Image bits",
+        description = "Image bits in Base64 format",
         help = "Image cannot be blank")
     }
 )
