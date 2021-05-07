@@ -4,6 +4,9 @@ from neural_network import NeuralNetwork
 
 import file_operations as io
 import methods
+import file_operations
+import constants
+import cv2
 
 ai_results = {}     # Dictionary to store the output of the AI
 ai: NeuralNetwork = None    # The AI model
@@ -46,20 +49,20 @@ class Home(Resource):
     @api.expect(model)
     def post(self, id):
         try:
-            image = None
-            try:
-                image = methods.read_image_from_bytes(request.json["image"])
-            except Exception as e:
-                name_space.abort(400, e.__doc__, status = "Error in reading image file", statusCode = "400")
+            image_bytes = request.json['image']
+            image = file_operations.read_image_from_bytes(image_bytes)
 
-            ai_results[id] = ai.predict(image)
+            pred = ai.predict(image)
+
+            ai_results[id] = pred
             return {
                 "status" : "Image uploaded",
                 "result" : ai_results[id]
             }
         except KeyError as e:
-            name_space.abort(500, e.__doc__, status = "Could not retrieve information", statusCode = "500")
+            name_space.abort(500, e.__doc__, status = "Could not retrieve information", statusCode = "500") 
         except Exception as e:
+            print(e)
             name_space.abort(400, e.__doc__, status = "Could not retrieve information", statusCode = "400")
 
 def train_ai():
@@ -67,14 +70,24 @@ def train_ai():
     nn.train(batch_size=1)
     nn.save('test')
 
+def test_image_bytes():
+    image = file_operations.load_image(constants.flickr_27_images_folder + '3006946827.jpg')
+    cv2.imshow("Original image", image)
+    cv2.waitKey(0)
+    bytes_string = file_operations.convert_img_to_base64(image)
+    print(bytes_string)
+
+    cvimg = file_operations.read_image_from_bytes(bytes_string)
+    cv2.imshow("test", cvimg)
+    cv2.waitKey(0)
 
 if __name__ == '__main__':
+    test_image_bytes()
+    # # Load AI
+    # print('Loading AI...')
+    # ai = NeuralNetwork(model=io.load_model('ai/test.h5'))
+    # print('AI loaded successfully')
 
-    # Load AI
-    print('Loading AI...')
-    ai = NeuralNetwork(model=io.load_model('ai/test.h'))
-    print('AI loaded successfully')
-
-    # Start flask server
-    app.run(debug=True)
+    # # Start flask server
+    # app.run(debug=True)
     # train_ai()

@@ -1,5 +1,9 @@
+from PIL import Image
+import base64
 import cv2
 import glob
+import io
+import numpy as np
 import pandas as pd
 import constants
 import tensorflow as tf
@@ -62,3 +66,15 @@ def load_model(path:str):
     path: the path of the model file, complete with .h5 extension
     """
     return tf.keras.models.load_model(path)
+
+def read_image_from_bytes(base64_string:str):
+    """ Read image from bytes (base64) string"""
+    decoded_data = base64.b64decode(base64_string)
+    np_data = np.frombuffer(decoded_data, np.uint8)
+    return cv2.imdecode(np_data, cv2.IMREAD_UNCHANGED)
+
+def convert_img_to_base64(image):
+    """Convert cv2 image into base64 bytes string"""
+    retval, buffer = cv2.imencode('.jpg', image)
+    base64_string = base64.b64encode(buffer)
+    return base64_string

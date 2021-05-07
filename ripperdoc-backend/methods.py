@@ -77,7 +77,7 @@ def __convert_labels_to_index_correspondence(labels):
 def prepare_images_for_mlp_input(images, 
                                     width:int = constants.image_width,
                                     height:int = constants.image_height,
-                                    color_channels = constnats.color_channels):
+                                    color_channels = constants.color_channels):
     # Prepare the images and format them to be compatible with the given neural network model
     images = __resize_images(images, width, height)   #Resize the images to a uniform size
     images = __convert_to_numpy_arr(images, width, height, color_channels)    #Convert the list to a numpy array
@@ -106,9 +106,3 @@ def show_prediction_graph_with_label(image, prediction:str, label:str):
     plt.title("Prediction: " + prediction + " Label: " + label)
     plt.imshow(image, cmap="gray")
     plt.show()
-
-def read_image_from_bytes(bytes_str:str):
-    """ Read image from bytes string"""
-    nparr = numpy.frombuffer(bytes_str, dtype = numpy.uint8)
-    img = cv2.imdecode(nparr, cv2.CV_LOAD_IMAGE_COLOR)
-    return img
