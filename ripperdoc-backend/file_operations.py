@@ -2,6 +2,7 @@ import cv2
 import glob
 import pandas as pd
 import constants
+import tensorflow as tf
 
 def load_image(filename):
     image = cv2.imread(filename)      # Read image file
@@ -54,3 +55,10 @@ def load_test_images(source:constants.Dataset = constants.Dataset.Flickr27):
                 images[label] = [image]
 
     return images
+
+def load_model(path:str):
+    """
+    Method to laod the desired neural network model
+    path: the path of the model file, complete with .h5 extension
+    """
+    return tf.keras.models.load_model(path)
