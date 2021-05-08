@@ -78,16 +78,20 @@ def test_image_bytes():
     print(bytes_string)
 
     cvimg = file_operations.read_image_from_bytes(bytes_string)
-    cv2.imshow("test", cvimg)
+
+    pred = ai.predict(cvimg)
+
+    cv2.imshow(pred, cvimg)
     cv2.waitKey(0)
 
 if __name__ == '__main__':
-    test_image_bytes()
     # # Load AI
-    # print('Loading AI...')
-    # ai = NeuralNetwork(model=io.load_model('ai/test.h5'))
-    # print('AI loaded successfully')
+    print('Loading AI...')
+    ai = NeuralNetwork(model=io.load_model('ai/test.h5'))
+    print('AI loaded successfully')
+
+    # test_image_bytes()
 
     # # Start flask server
-    # app.run(debug=True)
+    app.run(debug=True)
     # train_ai()
