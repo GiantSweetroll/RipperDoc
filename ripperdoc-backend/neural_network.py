@@ -2,6 +2,7 @@ import constants
 import methods
 import file_operations
 import tensorflow as tf
+import datetime
 
 class NeuralNetwork():
     
@@ -56,6 +57,32 @@ class NeuralNetwork():
         test_images, test_labels = methods.get_image_and_label_for_mlp_input(file_operations.load_test_images(source = dataset), width, height, color_channels)
         print('Test images loaded.')
         
+        # Prepare tensorboard
+        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+        
+        # Configure callbacks
+        early_stopping = tf.keras.callbacks.EarlyStopping(
+                            # Stop training when `val_loss` is no longer improving
+                            monitor="val_loss",
+                            # "no longer improving" being defined as "no better than 1e-2 less"
+                            min_delta=1e-2,
+                            # "no longer improving" being further defined as "for at least 2 epochs"
+                            patience=2,
+                            verbose=1,
+                        )
+        model_checkpoint = tf.keras.callbacks.ModelCheckpoint(
+                            # Path where to save the model
+                            # The two parameters below mean that we will overwrite
+                            # the current checkpoint if and only if
+                            # the `val_loss` score has improved.
+                            # The saved model name will include the current epoch.
+                            filepath="ai/xception_{epoch}",
+                            save_best_only=True,  # Only save a model if `val_loss` has improved.
+                            monitor="val_loss",
+                            verbose=1,
+                        )
+
         # Train the neural network
         print('Begin training AI....')
         return self.get_model().fit(train_images, 
@@ -63,7 +90,8 @@ class NeuralNetwork():
                                     batch_size = batch_size, 
                                     epochs = epochs, 
                                     verbose = verbose, 
-                                    validation_data = (test_images, test_labels))
+                                    validation_data = (test_images, test_labels),
+                                    callbacks=[tensorboard_callback])
         print('Training AI completed!')
         
     def save(self, filename):
