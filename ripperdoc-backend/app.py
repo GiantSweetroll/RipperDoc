@@ -93,5 +93,5 @@ if __name__ == '__main__':
     # test_image_bytes()
 
     # # Start flask server
-    app.run(debug=True)
+    app.run(host='0.0.0.0')
     # train_ai()
