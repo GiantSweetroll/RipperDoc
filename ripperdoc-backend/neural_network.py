@@ -1,5 +1,6 @@
 import constants
 import methods
+import numpy as np
 import file_operations
 import tensorflow as tf
 import datetime
@@ -115,7 +116,7 @@ class NeuralNetwork():
 
         # Load training and test images
         print('Loading training and validation images....')
-        train_ds, val_ds = file_operations.load_training_dataset()
+        train_ds, val_ds = file_operations.load_training_dataset(augment=True)
         x_train, y_train = next(iter(train_ds))
         x_val, y_val = next(iter(val_ds))
         # Convert labels into 1 hot format
@@ -173,7 +174,7 @@ class NeuralNetwork():
         self.get_model().evaluate(data, labels, verbose = verbose)
         
     def predict(self, image, show_pred_graph:bool = False) -> str:
-        """Method to predict what character is the image, returns the image."""
+        """Method to predict what character is the image, returns the label."""
 
         # Format image input to fit model
         temp = methods.prepare_images_for_mlp_input([image])
@@ -188,3 +189,18 @@ class NeuralNetwork():
             methods.show_prediction_graph(image.reshape(constants.image_width, constants.image_height, constants.color_channels), predLabel)
             
         return predLabel
+    
+    def predict2(self, image) -> str:
+        """
+        Method to predict what character is the image, returns the logo name.
+        image: image tensor
+        """
+        input_arr = tf.keras.preprocessing.image.img_to_array(image)
+        input_arr = np.array([input_arr])
+        input_arr /= 255        # Apply normalization
+
+        # Make prediction
+        prediction = self.get_model().predict(input_arr)
+        pred_label:str = constants.labels[int(prediction.argmax().__str__())]
+
+        return pred_label
