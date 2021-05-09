@@ -1,4 +1,5 @@
 import shutil
+import os
 
 root_directory : str = "datasets/flickr_logos_27_dataset/"      # The root directory of where to get the files
 images_source_directory: str = root_directory + 'flickr_logos_27_dataset_images/'    # Location of the original images
@@ -17,7 +18,11 @@ for x in training_file.read().splitlines():
         sub:list = x.split()
         if sub[1] == logo:
             included_data_train.append(x)
-            shutil.copy2(images_source_directory + sub[0], filtered_images_directory + sub[0])      # Copy image to new directory
+            src_path:str = images_source_directory + sub[0]
+            dst_path:str = filtered_images_directory + sub[1] + "/"
+            if not os.path.exists(dst_path):
+                os.makedirs(dst_path)
+            shutil.copy2(src_path, dst_path + sub[0])      # Copy image to new directory
 
 # Scan through the query dataset and only extract the images that matches the category
 included_data_validation : list = []
@@ -27,7 +32,11 @@ for x in query_file.read().splitlines():
         sub:list = x.split()
         if sub[1] == logo:
             included_data_validation.append(x)
-            shutil.copy2(images_source_directory + sub[0], filtered_images_directory + sub[0])      # Copy image to new directory
+            src_path:str = images_source_directory + sub[0]
+            dst_path:str = filtered_images_directory + sub[1] + "/"
+            if not os.path.exists(dst_path):
+                os.makedirs(dst_path)
+            shutil.copy2(src_path, dst_path + sub[0])      # Copy image to new directory
 
 # Write to file
 trimmed_train_dataset = open(root_directory + "trimmed_training_dataset.txt", "w")
