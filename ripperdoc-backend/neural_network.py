@@ -38,68 +38,6 @@ class NeuralNetwork():
     #Other Methods
     def train(self,
                 dataset: constants.Dataset = constants.Dataset.Flickr27,
-                batch_size:int = 32, 
-                epochs:int = 10, 
-                verbose:int = 2):
-        """
-        Train the neural network model
-        batch_size: amount of images to train with at one given time
-        epochs: training iterations to do
-        verbose: verbose mode. (0=silent, 1=minimal, 2=every batch)
-        validation_data: the data used to validate the neural network model
-        """
-        width = constants.image_width
-        height = constants.image_height
-        color_channels = constants.color_channels
-
-        #Load training and test images
-        print('Loading training images....')
-        train_images, train_labels = methods.get_image_and_label_for_mlp_input(file_operations.load_training_images(source = dataset), width, height, color_channels)
-        print('Training images loaded.')
-        print('Loading test images...')
-        test_images, test_labels = methods.get_image_and_label_for_mlp_input(file_operations.load_test_images(source = dataset), width, height, color_channels)
-        print('Test images loaded.')
-        
-        # Prepare tensorboard
-        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-        
-        # Configure callbacks
-        early_stopping_callback = tf.keras.callbacks.EarlyStopping(
-                            # Stop training when `val_loss` is no longer improving
-                            monitor="val_loss",
-                            # "no longer improving" being defined as "no better than 1e-2 less"
-                            min_delta=1e-2,
-                            # "no longer improving" being further defined as "for at least 2 epochs"
-                            patience=10,
-                            verbose=1
-                        )
-        model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-                            # Path where to save the model
-                            # The two parameters below mean that we will overwrite
-                            # the current checkpoint if and only if
-                            # the `val_loss` score has improved.
-                            # The saved model name will include the current epoch.
-                            filepath="ai/xception_{epoch}",
-                            save_best_only=True,  # Only save a model if `val_loss` has improved.
-                            monitor="val_loss",
-                            verbose=1,
-                            save_weights_only=False
-                        )
-
-        # Train the neural network
-        print('Begin training AI....')
-        return self.get_model().fit(train_images, 
-                                    train_labels, 
-                                    batch_size = batch_size, 
-                                    epochs = epochs, 
-                                    verbose = verbose, 
-                                    validation_data = (test_images, test_labels),
-                                    callbacks=[tensorboard_callback, early_stopping_callback, model_checkpoint_callback])
-        print('Training AI completed!')
-    
-    def train2(self,
-                dataset: constants.Dataset = constants.Dataset.Flickr27,
                 batch_size:int = constants.default_batch_size, 
                 epochs:int = 10, 
                 verbose:int = 2):
@@ -144,7 +82,7 @@ class NeuralNetwork():
             # the current checkpoint if and only if
             # the `val_loss` score has improved.
             # The saved model name will include the current epoch.
-            filepath="ai/xception_{epoch}",
+            filepath="ai/xception_{epoch}.h5",
             save_best_only=True,  # Only save a model if `val_loss` has improved.
             monitor="val_loss",
             verbose=1,
@@ -172,25 +110,8 @@ class NeuralNetwork():
     def evaluate(self, data, labels, verbose = 2):
         """Function to evaluate the accuracy of the model"""
         self.get_model().evaluate(data, labels, verbose = verbose)
-        
-    def predict(self, image, show_pred_graph:bool = False) -> str:
-        """Method to predict what character is the image, returns the label."""
-
-        # Format image input to fit model
-        temp = methods.prepare_images_for_mlp_input([image])
-        image = temp[0].reshape(1, constants.image_width, constants.image_height, constants.color_channels)
-
-        #If show_pred_graph = True, it will draw the image and the prediction in a matplotlib graph
-        prediction = self.get_model().predict(image)
-        prediction_argmax = prediction.argmax()
-        predLabel:str = constants.labels[int(prediction_argmax.__str__())]
-        
-        if show_pred_graph:
-            methods.show_prediction_graph(image.reshape(constants.image_width, constants.image_height, constants.color_channels), predLabel)
-            
-        return predLabel
     
-    def predict2(self, image) -> str:
+    def predict(self, image) -> str:
         """
         Method to predict what character is the image, returns the logo name.
         image: image tensor
