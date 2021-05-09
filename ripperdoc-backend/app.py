@@ -65,33 +65,27 @@ class Home(Resource):
             print(e)
             name_space.abort(400, e.__doc__, status = "Could not retrieve information", statusCode = "400")
 
-def train_ai():
-    nn: NeuralNetwork = NeuralNetwork()
-    nn.train(batch_size=1)
-    nn.save('test')
-
 def test_image_bytes():
-    image = file_operations.load_image(constants.flickr_27_images_folder + '3006946827.jpg')
+    image = file_operations.load_image(constants.flickr_27_images_folder + '2777979648.jpg')
     cv2.imshow("Original image", image)
     cv2.waitKey(0)
     bytes_string = file_operations.convert_img_to_base64(image)
     print(bytes_string)
 
     cvimg = file_operations.read_image_from_bytes(bytes_string)
-
     pred = ai.predict(cvimg)
-
     cv2.imshow(pred, cvimg)
     cv2.waitKey(0)
 
 if __name__ == '__main__':
-    # # Load AI
+    # Load AI
     print('Loading AI...')
-    ai = NeuralNetwork(model=io.load_model('ai/test.h5'))
+    ai = NeuralNetwork(model=io.load_model('ai/xception_14'))
     print('AI loaded successfully')
 
     # test_image_bytes()
 
-    # # Start flask server
+    # Start flask server or train AI
     app.run(host='0.0.0.0')
-    # train_ai()
+    # ai.train(batch_size=16, epochs=50)
+    # ai.save('xception')
