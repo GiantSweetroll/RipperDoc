@@ -14,7 +14,6 @@ Future<http.Response> postImage(String userID, String base64String) {
       'Content-Type' : 'application/json; charset=UTF-8'
     },
     body: jsonEncode(<String, String> {
-      "id" : userID,
       "image" : base64String,
     }),
   );
