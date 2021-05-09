@@ -3,7 +3,7 @@ import os
 
 root_directory : str = "datasets/flickr_logos_27_dataset/"      # The root directory of where to get the files
 images_source_directory: str = root_directory + 'flickr_logos_27_dataset_images/'    # Location of the original images
-filtered_images_directory: str = root_directory + 'ripperdoc_filtered/'         # Location of filetered images
+filtered_images_directory: str = 'L:/For Machine Learning/Project/RipperDoc/dataset/'         # Location of filetered images
 
 # Process what category to find
 logo_to_find_file = open(root_directory + "logo_to_find.txt", "r")    # load the file that contains what logo to find from the training datasets
