@@ -1,4 +1,3 @@
-
 import base64
 import cv2
 import glob
@@ -6,6 +5,7 @@ import numpy as np
 import pandas as pd
 import constants
 import tensorflow as tf
+import methods
 
 def load_image(filename):
     image = cv2.imread(filename)      # Read image file
@@ -44,7 +44,7 @@ def load_test_images(source:constants.Dataset = constants.Dataset.Flickr27):
     ### Load flickr_27 logos
     # Read training dataset file
     if source == constants.Dataset.Flickr27 or source == None:
-        df: pd.DataFrame = pd.read_csv(constants.flickr_27_test_dataset_file, delimiter='\t', header=None)
+        df: pd.DataFrame = pd.read_csv(constants.flickr_27_validation_dataset_file, delimiter='\t', header=None)
         # Loop through data frame
         for i in df.index:
             image_file: str = df.loc[i][0]      # Image name
@@ -59,12 +59,61 @@ def load_test_images(source:constants.Dataset = constants.Dataset.Flickr27):
 
     return images
 
+def load_training_dataset(
+    source:constants.Dataset = constants.Dataset.Flickr27, 
+    batch_size:int = constants.default_batch_size,
+    img_width:int = constants.image_width, 
+    img_height:int = constants.image_height,
+    validation_split:float = 0.2,
+):
+    """ Load training and validation images using tensorflow"""
+    # Get dataset directory
+    data_dir:str = None     # Dataset directory
+    if source == constants.Dataset.Flickr27:
+        data_dir = constants.flickr_27_images_folder
+    
+    # Get training dataset
+    train_ds = tf.keras.preprocessing.image_dataset_from_directory(
+        data_dir,
+        validation_split=validation_split,
+        subset='training',
+        seed=123,
+        image_size=(img_width, img_height),
+        batch_size=batch_size
+    )
+    
+    # Get validation dataset
+    val_ds = tf.keras.preprocessing.image_dataset_from_directory(
+        data_dir,
+        validation_split=validation_split,
+        subset='validation',
+        seed=123,
+        image_size=(img_width, img_height),
+        batch_size=batch_size
+    )
+
+    # Normalize data
+    normalization_layer = tf.keras.layers.experimental.preprocessing.Rescaling(1./255)
+    train_ds = methods.normalize_dataset(train_ds, normalization_layer)
+    val_ds = methods.normalize_dataset(val_ds, normalization_layer)
+
+    # Configure performance
+    AUTOTUNE = tf.data.AUTOTUNE
+    train_ds = train_ds.cache().prefetch(buffer_size=AUTOTUNE)
+    val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
+
+    return train_ds, val_ds
+
 def load_model(path:str):
     """
     Method to laod the desired neural network model
-    path: the path of the model file, complete with .h5 extension
+    path: the path of the model file, complete with .tf extension
     """
-    return tf.keras.models.load_model(path)
+    try:
+        return tf.keras.models.load_model(path)
+    except IOError as e:
+        print(e)
+        return None
 
 def read_image_from_bytes(base64_string:str):
     """ Read image from bytes (base64) string"""
