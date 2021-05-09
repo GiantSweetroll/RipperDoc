@@ -11,6 +11,7 @@ class NeuralNetwork():
         """A class to represent the neural network object"""
         if model == None:
             # Use Xception model
+            print("Building new Xception model...")
             model = tf.keras.applications.Xception(include_top=True, 
                 weights=None, 
                 input_tensor=None,
@@ -20,6 +21,7 @@ class NeuralNetwork():
                 classifier_activation='softmax'
             )
             model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])  # Compile the model
+            print("Model compiled!")
         self.__model = model
     
     #Setters and Getters
@@ -62,16 +64,16 @@ class NeuralNetwork():
         tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
         
         # Configure callbacks
-        early_stopping = tf.keras.callbacks.EarlyStopping(
+        early_stopping_callback = tf.keras.callbacks.EarlyStopping(
                             # Stop training when `val_loss` is no longer improving
                             monitor="val_loss",
                             # "no longer improving" being defined as "no better than 1e-2 less"
                             min_delta=1e-2,
                             # "no longer improving" being further defined as "for at least 2 epochs"
-                            patience=2,
-                            verbose=1,
+                            patience=10,
+                            verbose=1
                         )
-        model_checkpoint = tf.keras.callbacks.ModelCheckpoint(
+        model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
                             # Path where to save the model
                             # The two parameters below mean that we will overwrite
                             # the current checkpoint if and only if
@@ -81,6 +83,7 @@ class NeuralNetwork():
                             save_best_only=True,  # Only save a model if `val_loss` has improved.
                             monitor="val_loss",
                             verbose=1,
+                            save_weights_only=False
                         )
 
         # Train the neural network
@@ -91,13 +94,13 @@ class NeuralNetwork():
                                     epochs = epochs, 
                                     verbose = verbose, 
                                     validation_data = (test_images, test_labels),
-                                    callbacks=[tensorboard_callback])
+                                    callbacks=[tensorboard_callback, early_stopping_callback, model_checkpoint_callback])
         print('Training AI completed!')
         
     def save(self, filename):
         """save the current state of the model as a file so that it can be loaded in the future"""
         print('Saving AI model...')
-        self.get_model().save("ai/" + filename + ".h5")
+        self.get_model().save("ai/" + filename)
         print('AI model saved!')
         
     def evaluate(self, data, labels, verbose = 2):
