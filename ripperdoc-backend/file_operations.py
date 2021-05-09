@@ -1,8 +1,3 @@
-import base64
-import cv2
-import glob
-import numpy as np
-import pandas as pd
 import constants
 import tensorflow as tf
 import methods
