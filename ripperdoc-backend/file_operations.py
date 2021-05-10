@@ -1,9 +1,9 @@
 import constants
 import tensorflow as tf
 import methods
+import tempfile
 
 def load_training_dataset(
-    source:constants.Dataset = constants.Dataset.Flickr27, 
     batch_size:int = constants.default_batch_size,
     img_width:int = constants.image_width, 
     img_height:int = constants.image_height,
@@ -12,9 +12,7 @@ def load_training_dataset(
 ):
     """ Load training and validation images using tensorflow"""
     # Get dataset directory
-    data_dir:str = None     # Dataset directory
-    if source == constants.Dataset.Flickr27:
-        data_dir = constants.flickr_27_images_folder
+    data_dir:str = constants.dataset_loc     # Dataset directory
     
     # Get training dataset
     train_ds = tf.keras.preprocessing.image_dataset_from_directory(
