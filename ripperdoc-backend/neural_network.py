@@ -82,7 +82,7 @@ class NeuralNetwork():
             # the current checkpoint if and only if
             # the `val_loss` score has improved.
             # The saved model name will include the current epoch.
-            filepath="ai/xception_{epoch}.h5",
+            filepath="ai/xception_{epoch}",
             save_best_only=True,  # Only save a model if `val_loss` has improved.
             monitor="val_loss",
             verbose=1,
