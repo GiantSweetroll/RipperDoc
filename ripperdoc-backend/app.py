@@ -71,8 +71,5 @@ if __name__ == '__main__':
     ai = NeuralNetwork(model=io.load_model('ai/xception_1'))
     print('AI loaded successfully')
 
-    # test_image_bytes()
-
     # Start flask server or train AI
-    # app.run(host='0.0.0.0')
-    ai.train(batch_size=16, epochs=50)
+    app.run(host='0.0.0.0')
