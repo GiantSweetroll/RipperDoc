@@ -37,7 +37,6 @@ class NeuralNetwork():
         
     #Other Methods
     def train(self,
-                dataset: constants.Dataset = constants.Dataset.Flickr27,
                 batch_size:int = constants.default_batch_size, 
                 epochs:int = 10, 
                 verbose:int = 2):
