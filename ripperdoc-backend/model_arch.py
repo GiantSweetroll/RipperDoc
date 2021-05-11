@@ -2,24 +2,10 @@ import tensorflow as tf
 import tensorflow.keras.layers as layers
 import constants
 
-class LogoRecog(tf.keras.models.Sequential):
-    def __init__(self, class_count:int):
-        super().__init__(layers=[
-            layers.Conv2D(32, kernel_size=(5, 5), activation='relu', input_shape=(224, 224, 3)),
-            layers.MaxPooling2D(strides=2),
-            layers.Conv2D(32, kernel_size=(5, 5), activation='relu'),
-            layers.AveragePooling2D(strides=2),
-            layers.Conv2D(64, kernel_size=(5, 5), activation='relu'),
-            layers.AveragePooling2D(strides=2),
-            layers.Dense(64),
-            layers.Dense(33, activation='softmax')
-        ])
-
 MOBILENETV2 = tf.keras.applications.MobileNet(
     classes=len(constants.labels),
     classifier_activation='softmax',
     weights=None,
-    dropout=0.01
 )
 
 XCEPTION = tf.keras.applications.Xception(
@@ -31,3 +17,36 @@ XCEPTION = tf.keras.applications.Xception(
     classes=len(constants.labels),
     classifier_activation='softmax'
 )
+
+def custom_model(input_shape:(), class_count:int):
+    model = tf.keras.models.Sequential()
+    model.add(layers.Conv2D(16, kernel_size=(5, 5), activation='relu', input_shape=input_shape))
+    model.add(layers.Conv2D(32, kernel_size=(5, 5),activation='relu'))
+    model.add(layers.Conv2D(64, (5, 5), activation='relu'))
+    # Reduce by taking the max of each 2x2 block
+    model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+    # Dropout to avoid overfitting
+    model.add(layers.Dropout(0.25))
+    # Flatten the results to one dimension for passing into our final layer
+    model.add(layers.Flatten())
+    # A hidden layer to learn with
+    model.add(layers.Dense(64, activation='relu'))
+    # Another dropout
+    model.add(layers.Dropout(0.5))
+    # Final categorization with softmax
+    model.add(layers.Dense(class_count, activation='softmax'))
+
+    return model
+
+def logo_recog(class_count: int):
+    return tf.keras.models.Sequential([
+        layers.Conv2D(32, kernel_size=(5, 5), activation='relu', input_shape=(224, 224, 3)),
+        layers.MaxPooling2D(strides=2),
+        layers.Conv2D(32, kernel_size=(5, 5), activation='relu'),
+        layers.AveragePooling2D(strides=2),
+        layers.Conv2D(64, kernel_size=(5, 5), activation='relu'),
+        layers.AveragePooling2D(strides=2),
+        layers.Flatten(),
+        layers.Dense(64),
+        layers.Dense(class_count, activation='softmax')
+    ], name='logo_recog')
