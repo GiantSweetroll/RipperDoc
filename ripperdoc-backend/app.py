@@ -1,15 +1,13 @@
 from flask import Flask, request
 from flask_restx import Resource, Api, fields
-from neural_network import NeuralNetwork
 
-import tensorflow as tf
-import file_operations as io
-import methods
-import file_operations
 import constants
+import methods
+import numpy as np
+import requests
+import tensorflow as tf
 
 ai_results = {}     # Dictionary to store the output of the AI
-ai: NeuralNetwork = None    # The AI model
 
 app = Flask(__name__)
 api = Api(app = app,
@@ -49,10 +47,20 @@ class Home(Resource):
     @api.expect(model)
     def post(self, id):
         try:
+            # Decode image into tensor
             image_bytes = request.json['image']
             image = tf.image.decode_image(image_bytes, dtype=tf.string, channels=3)
 
-            pred = ai.predict(image)
+            # Format input
+            input_arr = tf.keras.preprocessing.image.img_to_array(image)
+            input_arr = np.array([input_arr])
+            input_arr /= 255        # Apply normalization
+
+            # Make prediction
+            url = 'localhost:8501/models/ripperdoc_xception:predict'
+            payload = '{"instances" : ' + input_arr + '}'
+            result = requests.post(url, payload)
+            pred:str = constants.labels[int(result.argmax().__str__())]
 
             ai_results[id] = pred
             return {
@@ -66,10 +74,5 @@ class Home(Resource):
             name_space.abort(400, e.__doc__, status = "Could not retrieve information", statusCode = "400")
 
 if __name__ == '__main__':
-    # Load AI
-    print('Loading AI...')
-    ai = NeuralNetwork(model=io.load_model('ai/xception_1'))
-    print('AI loaded successfully')
-
     # Start flask server or train AI
     app.run(host='0.0.0.0')
