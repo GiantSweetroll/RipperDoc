@@ -14,11 +14,13 @@ class NeuralNetwork():
         if model == None:
             # Use Xception model
             print("Building new Neural Network model...")
-            model = models.MOBILENETV2
+            # model = models.MOBILENETV2
+            # model = models.custom_model((constants.image_width, constants.image_height, constants.color_channels), len(constants.labels))
+            model = models.logo_recog(len(constants.labels))
 
             # Learning rate scheduler
             lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-                initial_learning_rate=0.01,
+                initial_learning_rate=0.001,
                 decay_steps=100000,
                 decay_rate=0.96,
                 staircase=True
@@ -56,7 +58,7 @@ class NeuralNetwork():
 
         # Load training and test images
         print('Loading training and validation images....')
-        train_ds, val_ds = file_operations.load_training_dataset(augment=True)
+        train_ds, val_ds = file_operations.load_training_dataset(augment=True, batch_size=batch_size)
         x_train, y_train = next(iter(train_ds))
         x_val, y_val = next(iter(val_ds))
         # Convert labels into 1 hot format
@@ -79,7 +81,7 @@ class NeuralNetwork():
             monitor="val_loss",
             # "no longer improving" being defined as "no better than 1e-2 less"
             min_delta=1e-2,
-            # "no longer improving" being further defined as "for at least 2 epochs"
+            # "no longer improving" being further defined as "for at least 10 epochs"
             patience=10,
             verbose=1
         )
@@ -96,7 +98,7 @@ class NeuralNetwork():
             save_weights_only=False
         )
         csv_logger = tf.keras.callbacks.CSVLogger(
-            'L:/For Machine Learning/Project/RipperDoc/models/training.csv',
+            'L:/For Machine Learning/Project/RipperDoc/models/training-' + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + '.csv',
             append=False
         )
 
@@ -117,10 +119,10 @@ class NeuralNetwork():
         )
         print('Training AI completed!')
 
-    def save(self, filename):
+    def save(self, path):
         """save the current state of the model as a file so that it can be loaded in the future"""
         print('Saving AI model...')
-        self.get_model().save("ai/" + filename)
+        self.get_model().save(path)
         print('AI model saved!')
         
     def evaluate(self, data, labels, verbose = 2):
@@ -134,6 +136,8 @@ class NeuralNetwork():
         """
         input_arr = tf.keras.preprocessing.image.img_to_array(image)
         input_arr = np.array([input_arr])
+        input_arr = tf.image.resize(input_arr, [constants.image_width, constants.image_height])
+        input_arr = np.array(input_arr)
         input_arr /= 255        # Apply normalization
 
         # Make prediction
