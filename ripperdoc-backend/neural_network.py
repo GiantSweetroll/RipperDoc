@@ -1,5 +1,6 @@
 import constants
 import methods
+import model_arch as models
 import numpy as np
 import file_operations
 import tensorflow as tf
@@ -12,16 +13,18 @@ class NeuralNetwork():
         """A class to represent the neural network object"""
         if model == None:
             # Use Xception model
-            print("Building new Xception model...")
-            model = tf.keras.applications.Xception(include_top=True, 
-                weights=None, 
-                input_tensor=None,
-                input_shape=None,
-                pooling=None,
-                classes=len(constants.labels),
-                classifier_activation='softmax'
+            print("Building new Neural Network model...")
+            model = models.MOBILENETV2
+
+            # Learning rate scheduler
+            lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+                initial_learning_rate=0.01,
+                decay_steps=100000,
+                decay_rate=0.96,
+                staircase=True
             )
-            model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])  # Compile the model
+
+            model.compile(loss='categorical_crossentropy', optimizer=tf.keras.optimizers.Adam(learning_rate=lr_schedule), metrics=['accuracy'])  # Compile the model
             print("Model compiled!")
         self.__model = model
     
@@ -62,8 +65,13 @@ class NeuralNetwork():
         print('Training and validation images loaded.')
         
         # Prepare tensorboard
-        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+        log_dir = "L:/For Machine Learning/Project/RipperDoc/models/logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(
+            log_dir=log_dir, 
+            histogram_freq=1,
+            embeddings_freq=1,
+            write_images=True,
+        )
         
         # Configure callbacks
         early_stopping_callback = tf.keras.callbacks.EarlyStopping(
@@ -81,11 +89,15 @@ class NeuralNetwork():
             # the current checkpoint if and only if
             # the `val_loss` score has improved.
             # The saved model name will include the current epoch.
-            filepath="ai/xception_{epoch}",
+            filepath= constants.model_loc + "ripperdoc_{epoch}",
             save_best_only=True,  # Only save a model if `val_loss` has improved.
             monitor="val_loss",
             verbose=1,
             save_weights_only=False
+        )
+        csv_logger = tf.keras.callbacks.CSVLogger(
+            'L:/For Machine Learning/Project/RipperDoc/models/training.csv',
+            append=False
         )
 
         # Train the neural network
@@ -96,7 +108,12 @@ class NeuralNetwork():
             epochs = epochs, 
             verbose = verbose, 
             validation_data = (x_val, y_val),
-            callbacks=[tensorboard_callback, early_stopping_callback, model_checkpoint_callback]
+            callbacks=[
+                tensorboard_callback, 
+                early_stopping_callback, 
+                # model_checkpoint_callback, 
+                csv_logger
+            ]
         )
         print('Training AI completed!')
 
