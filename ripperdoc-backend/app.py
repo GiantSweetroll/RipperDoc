@@ -62,6 +62,7 @@ class Home(Resource):
             result = requests.post(url, payload)
             pred:str = constants.labels[int(result.argmax().__str__())]
 
+            # Return as response
             ai_results[id] = pred
             return {
                 "status" : "Image uploaded",
