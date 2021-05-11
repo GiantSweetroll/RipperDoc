@@ -21,7 +21,7 @@ name_space = api.namespace('api-backend', description='Manage RipperDoc API')   
 # Model for input from front-end
 model = api.model("Image Model",
     {"image" : fields.String(required = True,
-        description = "Image bits in Base64 format",
+        description = "Image bits in Base64 format (jpg)",
         help = "Image cannot be blank")
     }
 )
@@ -54,13 +54,19 @@ class Home(Resource):
             # Format input
             input_arr = tf.keras.preprocessing.image.img_to_array(image)
             input_arr = np.array([input_arr])
+            input_arr = tf.image.resize(input_arr, [constants.image_width, constants.image_height])  # Resize image to fit neural network input
+            input_arr = np.array(input_arr)     # Convert it back to numpy array
             input_arr /= 255        # Apply normalization
 
-            # Make prediction
-            url = 'localhost:8501/models/ripperdoc_xception:predict'
-            payload = '{"instances" : ' + input_arr + '}'
-            result = requests.post(url, payload)
-            pred:str = constants.labels[int(result.argmax().__str__())]
+            # Make request to serving docker container
+            url = 'localhost:8501/v1/models/ripperdoc:predict'
+            payload = {"instances" : input_arr.tolist()}
+            response = requests.post(url = url, json = payload)
+            
+            # Process prediction
+            r_json = response.json()        # JSON data of response
+            pred_np = np.array(r_json['predictions'])       # Get prediction list and convert it to numpy array
+            pred:str = constants.labels[int(pred_np.argmax().__str__())]        # Apply argmax and convert it to label
 
             # Return as response
             ai_results[id] = pred
