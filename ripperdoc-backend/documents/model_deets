@@ -1,0 +1,3 @@
+name,img_width,img_height,color_channels
+xception,299,299,3
+logo_recog,224,224,3
