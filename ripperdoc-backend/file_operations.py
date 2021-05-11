@@ -1,14 +1,17 @@
+from PIL import Image
+
 import constants
 import tensorflow as tf
 import methods
-import tempfile
+import io
+import base64
 
 def load_training_dataset(
     batch_size:int = constants.default_batch_size,
     img_width:int = constants.image_width, 
     img_height:int = constants.image_height,
     validation_split:float = 0.2,
-    augment:bool = False
+    augment:bool = False,
 ):
     """ Load training and validation images using tensorflow"""
     # Get dataset directory
@@ -49,8 +52,8 @@ def load_training_dataset(
         # Apply data augmentation on training dataset
         data_augmentation = tf.keras.Sequential([
             tf.keras.layers.experimental.preprocessing.RandomFlip("horizontal_and_vertical"),
-            tf.keras.layers.experimental.preprocessing.RandomRotation(0.2),
-            tf.keras.layers.experimental.preprocessing.RandomContrast(0.2)
+            tf.keras.layers.experimental.preprocessing.RandomRotation(0.2, fill_mode='constant'),
+            # tf.keras.layers.experimental.preprocessing.RandomContrast(0.2)
         ])
         train_ds = train_ds.map(lambda x, y: (data_augmentation(x, training=True), y), num_parallel_calls=AUTOTUNE)
 
@@ -70,3 +73,15 @@ def load_model(path:str):
     except IOError as e:
         print(e)
         return None
+
+def load_image(path:str):
+    return Image.open(path)
+
+def convert_png_to_jpg(image:Image):
+    return image.convert('RGB')
+
+def get_as_base64_from(image: Image):
+    img_bytes = io.BytesIO()
+    image.save(img_bytes, format="JPEG")
+
+    return base64.b64encode(img_bytes.getvalue())
