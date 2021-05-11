@@ -6,7 +6,7 @@ import os
 
 # Load AI
 print('Loading AI...')
-ai = NeuralNetwork(model=io.load_model('ai/xception_1.h5'))
+ai = NeuralNetwork(model=io.load_model('ai/xception_hn'))
 print('AI loaded successfully')
 
 ai.train(batch_size=16, epochs=50)
