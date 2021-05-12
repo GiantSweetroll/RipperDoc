@@ -2,8 +2,6 @@ from flask import Flask, request
 from flask_restx import Resource, Api, fields
 
 import constants
-import docker
-import methods
 import numpy as np
 import requests
 import tensorflow as tf
@@ -12,10 +10,6 @@ import io
 from PIL import Image
 
 ai_results = {}     # Dictionary to store the output of the AI
-
-# Get ripperdoc serving container instance
-docker_client = docker.DockerClient()
-serving_container = docker_client.containers.get("ripperdoc-backend_serving_1")
 
 app = Flask(__name__)
 api = Api(app = app,
@@ -69,7 +63,7 @@ class Home(Resource):
             input_arr /= 255        # Apply normalization
 
             # Make request to serving docker container
-            serving_ip = serving_container.attrs['NetworkSettings']['Networks']['ripperdoc-backend_default']['IPAddress']
+            serving_ip = request.remote_addr
             url = 'http://' + serving_ip + ':8501/v1/models/ripperdoc:predict'
             payload = {"instances" : input_arr.tolist()}
             response = requests.post(url = url, json = payload)
