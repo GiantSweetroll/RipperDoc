@@ -12,13 +12,14 @@ There are two ways to start the containers (Docker Compose or Docker run command
 3. In the terminal, type `docker compose up` and hit enter. This should start all of the necessary containers. The backend container service will be available at port `5000` while the serving container service will be available at port `8501`
 
 ### Using Docker run command
-1. Open a terminal and enter the following commands
+Open a terminal and enter the following commands
 ```
 docker pull giantsweetroll/ripperdoc:serving
 docker pull giantsweetroll/ripperdoc:backend
 ```
-This will pull the needed images and be available for use.
-2. Run the containers
+This will pull the needed images and be available for use. <br>
+
+Nexxt, run the containers:
 ```
 docker run -d -p 8501:8501 --name ripperdoc-serving giantsweetroll/ripperdoc:serving
 docker run -d -p 5000:5000 --name ripperdoc-backend giantsweetroll/ripperdoc:backend
