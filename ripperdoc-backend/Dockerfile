@@ -10,7 +10,9 @@ RUN pip install flask
 RUN pip install flask-restx
 # RUN pip install matplotlib
 RUN pip install tensorflow
+RUN pip install Pillow
 # RUN pip install opencv-python
+RUN pip install docker
 
 EXPOSE 5000
 
