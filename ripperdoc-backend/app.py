@@ -2,12 +2,20 @@ from flask import Flask, request
 from flask_restx import Resource, Api, fields
 
 import constants
+import docker
 import methods
 import numpy as np
 import requests
 import tensorflow as tf
+import base64
+import io
+from PIL import Image
 
 ai_results = {}     # Dictionary to store the output of the AI
+
+# Get ripperdoc serving container instance
+docker_client = docker.DockerClient()
+serving_container = docker_client.containers.get("ripperdoc-backend_serving_1")
 
 app = Flask(__name__)
 api = Api(app = app,
@@ -49,7 +57,9 @@ class Home(Resource):
         try:
             # Decode image into tensor
             image_bytes = request.json['image']
-            image = tf.image.decode_image(image_bytes, dtype=tf.string, channels=3)
+            base64_bytes = image_bytes.encode('ascii')
+            im_file = io.BytesIO(base64.b64decode(base64_bytes))
+            image = Image.open(im_file)
 
             # Format input
             input_arr = tf.keras.preprocessing.image.img_to_array(image)
@@ -59,7 +69,8 @@ class Home(Resource):
             input_arr /= 255        # Apply normalization
 
             # Make request to serving docker container
-            url = 'localhost:8501/v1/models/ripperdoc:predict'
+            serving_ip = serving_container.attrs['NetworkSettings']['Networks']['ripperdoc-backend_default']['IPAddress']
+            url = 'http://' + serving_ip + ':8501/v1/models/ripperdoc:predict'
             payload = {"instances" : input_arr.tolist()}
             response = requests.post(url = url, json = payload)
             
