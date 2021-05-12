@@ -5,6 +5,7 @@ import tensorflow as tf
 import methods
 import io
 import base64
+from io import BytesIO
 
 def load_training_dataset(
     batch_size:int = constants.default_batch_size,
@@ -85,3 +86,9 @@ def get_as_base64_from(image: Image):
     image.save(img_bytes, format="JPEG")
 
     return base64.b64encode(img_bytes.getvalue())
+
+def convert_base64_to_image(base64str:str):
+    base64_bytes = base64.b64encode(base64str.encode('utf-8'))
+    im_file = BytesIO(base64_bytes)
+
+    return Image.open(im_file)
