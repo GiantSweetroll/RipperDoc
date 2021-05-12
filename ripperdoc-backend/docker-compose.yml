@@ -1,12 +1,12 @@
 version: "2"
 services:
-    ripperdoc-serving:
+    serving:
         image: giantsweetroll/ripperdoc:serving
         ports: 
             - 8501:8501
-    ripperdoc-backend:
+    backend:
         image: giantsweetroll/ripperdoc:backend
         ports: 
             - 5000:5000
         depends_on: 
-            - ripperdoc-serving
+            - serving
