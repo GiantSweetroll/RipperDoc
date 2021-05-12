@@ -12,6 +12,8 @@ RUN pip install flask-restx
 RUN pip install tensorflow
 # RUN pip install opencv-python
 
+EXPOSE 5000
+
 COPY . .
 
 CMD ["app.py"]
