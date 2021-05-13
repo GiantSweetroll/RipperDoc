@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 
 import 'package:ripperdoc_frontend/widgets/NavDrawer.dart';
-void main() => runApp(MyApp());
+import 'package:ripperdoc_frontend/widgets/PhotoScreen.dart';
 
+void main() {
+  runApp(MaterialApp(
+    title: "RipperDoc",
+    theme: ThemeData(
+      primarySwatch: Colors.blue,
+    ),
+    home: Scaffold(
+      body: PhotoScreen(),
+    ),    // TODO: change this to a wrapper class for cloud firestore
+  ));
+}
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -25,7 +36,7 @@ class MyHomePage extends StatelessWidget {
         title: Text('RipperDoc'),
       ),
       body: Center(
-        child: Text('Home'),
+        child: Text("Home"),
       ),
     );
   }
