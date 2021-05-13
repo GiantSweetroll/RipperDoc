@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "333604229505",
+    "project_id": "ripperdoc-53af5",
+    "storage_bucket": "ripperdoc-53af5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:333604229505:android:426a04bc6742697cadd880",
+        "android_client_info": {
+          "package_name": "com.giantsweetroll.ripperdoc_dataset_collector"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "333604229505-p18qkls3n3p3rg4qk27pf26ip0q5682h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6hDWrMPrCYQdgNpXL9jufbpR9iYpDCDE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "333604229505-p18qkls3n3p3rg4qk27pf26ip0q5682h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "333604229505-3b1l99hm4sghaq3pfsj7vprqml3ia9fo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.giantsweetroll.ripperdocFrontend"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:333604229505:android:1f35666b782d95ecadd880",
+        "android_client_info": {
+          "package_name": "com.giantsweetroll.ripperdoc_frontend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "333604229505-p18qkls3n3p3rg4qk27pf26ip0q5682h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6hDWrMPrCYQdgNpXL9jufbpR9iYpDCDE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "333604229505-p18qkls3n3p3rg4qk27pf26ip0q5682h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "333604229505-3b1l99hm4sghaq3pfsj7vprqml3ia9fo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.giantsweetroll.ripperdocFrontend"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
