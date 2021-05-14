@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import "package:flutter/material.dart";
+import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ripperdoc_frontend/services/api_services.dart';
 import 'package:ripperdoc_frontend/services/image_picker_service.dart';
 import 'package:ripperdoc_frontend/shared/loading.dart';
 
@@ -275,30 +279,30 @@ class _PhotoScreenState extends State<PhotoScreen> {
                 ElevatedButton(
                   onPressed: () async {
                     // Validate input
-                    if (this.imageFile != null && this._formKey.currentState.validate()) {
+                    if (this.isSubmitPicture && this.imageFile != null) {
                       this.setState(() {
                         this._error = "";
                       });
                       this._showLoading(context);
-                      // Upload to firebase storage
-                      File f = File(this.imageFile.path);
-                      // File f = File.fromRawPath(await this.imageFile.readAsBytes());
                       // TODO: Send image as base64 string to backend service
-                      /*
-                                String url = await storageServices.uploadFile(f, this.textEditingController.text);
-                                if (url.isEmpty) {
-                                  // Show error
-                                  this.setState(() {
-                                    this._error = "Unable to send image due to an error";
-                                  });
-                                } else {
-                                  // Reset fields
-                                  this.resetFields();
-                                }
-                                Navigator.pop(context);
+                      // Convert image to base 64 string
+                      Uint8List bytes = await this.imageFile.readAsBytes();
+                      String base64String = base64.encode(bytes);
 
-                                 */
-                    } else {
+                      // Post request to backend
+                      Response r = await postImage("1", base64String);    // TODO: change ID according to cloud firestore ID
+                      if (r.statusCode != 200) {
+                        this.setState(() {
+                          this._error = "Unable to process image due to an error (${r.statusCode})";
+                        });
+                      } else {
+                        print(r.body);
+                      }
+                      Navigator.pop(context);
+                    } else if (!this.isSubmitPicture && this._formKey.currentState.validate()) {
+                      // TODO: perform google search based on user input
+                      String query = "${this.textEditingController.text} repair shop";    // TODO: change as needed
+                    } else{
                       this.setState(() {
                         this._error = this.isSubmitPicture ? "Please upload a photo" : "Please upload a photo or fill in the text field";
                       });
