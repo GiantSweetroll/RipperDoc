@@ -162,7 +162,174 @@ class _PhotoScreenState extends State<PhotoScreen> {
     );
   }
 
-  //Overridden Methods\
+  /// Create the main widget of the screen
+  Widget _createMainWidget() {
+    return Form(
+      key: this._formKey,
+      child: Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Container(
+                  height: this.uploadAreaSize,
+                  width: this.uploadAreaSize,
+                  color: this.imageFile == null
+                      ? this.uploadImageBoxColor
+                      : Colors.transparent,
+                  child: this.imageFile == null ?  this._createUploadImageWidget(): this._showImageWidget(),
+                ),
+              ),
+              SizedBox(
+                height: 20.0,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                        margin: const EdgeInsets.only(left: 10.0, right: 20.0),
+                        child: Divider(
+                          color: Colors.black,
+                          height: 36,
+                        )),
+                  ),
+                  Text(
+                    "or",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                        margin: const EdgeInsets.only(left: 10.0, right: 20.0),
+                        child: Divider(
+                          color: Colors.black,
+                          height: 36,
+                        )),
+                  ),
+                ],
+              ),
+              SizedBox(height: (20),),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(50, 0, 50, 30),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    hintText: "Enter brand",
+                    hintStyle: TextStyle(
+                      color: Colors.white,
+                    ),
+                    fillColor: Colors.black45,
+                    filled: true,
+                  ),
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                  controller: this.textEditingController,
+                  validator: (val) {
+                    if (this.isSubmitPicture) {
+                      this.isSubmitPicture = false;
+                    }
+
+                    if (val.trim().isEmpty && !this.isSubmitPicture) {
+                      this.isSubmitPicture = true;
+                      return null;
+                    } else {
+                      return null;
+                    }
+                  },
+                ),
+              ),
+              Center(
+                child: Text(
+                  this._error,
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: this.resetFields,
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.red)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 8.0),
+                      child: Text(
+                        "RESET",
+                        style: TextStyle(
+                          fontSize: 30,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 20,),
+                  ElevatedButton(
+                    onPressed: () async {
+                      // Validate input
+                      if (this.imageFile != null && this._formKey.currentState.validate()) {
+                        this.setState(() {
+                          this._error = "";
+                        });
+                        this._showLoading(context);
+                        // Upload to firebase storage
+                        File f = File(this.imageFile.path);
+                        // File f = File.fromRawPath(await this.imageFile.readAsBytes());
+                        // TODO: Send image as base64 string to backend service
+                        /*
+                                String url = await storageServices.uploadFile(f, this.textEditingController.text);
+                                if (url.isEmpty) {
+                                  // Show error
+                                  this.setState(() {
+                                    this._error = "Unable to send image due to an error";
+                                  });
+                                } else {
+                                  // Reset fields
+                                  this.resetFields();
+                                }
+                                Navigator.pop(context);
+
+                                 */
+                      } else {
+                        this.setState(() {
+                          this._error = this.isSubmitPicture ? "Please upload a photo" : "Please upload a photo or fill in the text field";
+                        });
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 8.0),
+                      child: Text(
+                        this.buttonText,
+                        style: TextStyle(
+                          fontSize: 30,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  //Overridden Methods
   @override
   void dispose() {
     this.textEditingController.dispose();
@@ -173,170 +340,18 @@ class _PhotoScreenState extends State<PhotoScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        // color: colorAppBase,
         decoration: decorationAppBase,
-        child: Form(
-          key: this._formKey,
-          child: Center(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(20.0),
-                    child: Container(
-                      height: this.uploadAreaSize,
-                      width: this.uploadAreaSize,
-                      color: this.imageFile == null
-                          ? this.uploadImageBoxColor
-                          : Colors.transparent,
-                      child: this.imageFile == null ?  this._createUploadImageWidget(): this._showImageWidget(),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: new Container(
-                            margin: const EdgeInsets.only(left: 10.0, right: 20.0),
-                            child: Divider(
-                              color: Colors.black,
-                              height: 36,
-                            )),
-                      ),
-                      Text(
-                        "or",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
-                      Expanded(
-                        child: new Container(
-                            margin: const EdgeInsets.only(left: 10.0, right: 20.0),
-                            child: Divider(
-                              color: Colors.black,
-                              height: 36,
-                            )),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: (20),),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(50, 0, 50, 30),
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        hintText: "Enter brand",
-                        hintStyle: TextStyle(
-                          color: Colors.white,
-                        ),
-                        fillColor: Colors.black45,
-                        filled: true,
-                      ),
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                      controller: this.textEditingController,
-                      validator: (val) {
-                        if (this.isSubmitPicture) {
-                          this.isSubmitPicture = false;
-                        }
-
-                        if (val.trim().isEmpty && !this.isSubmitPicture) {
-                          this.isSubmitPicture = true;
-                          return null;
-                        } else {
-                          return null;
-                        }
-                      },
-                    ),
-                  ),
-                  Center(
-                    child: Text(
-                      this._error,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: this.resetFields,
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.red)
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10.0, vertical: 8.0),
-                          child: Text(
-                            "RESET",
-                            style: TextStyle(
-                              fontSize: 30,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 20,),
-                      ElevatedButton(
-                        onPressed: () async {
-                          // Validate input
-                          if (this.imageFile != null && this._formKey.currentState.validate()) {
-                            this.setState(() {
-                              this._error = "";
-                            });
-                            this._showLoading(context);
-                            // Upload to firebase storage
-                            File f = File(this.imageFile.path);
-                            // File f = File.fromRawPath(await this.imageFile.readAsBytes());
-                            // TODO: Send image as base64 string to backend service
-                            /*
-                            String url = await storageServices.uploadFile(f, this.textEditingController.text);
-                            if (url.isEmpty) {
-                              // Show error
-                              this.setState(() {
-                                this._error = "Unable to send image due to an error";
-                              });
-                            } else {
-                              // Reset fields
-                              this.resetFields();
-                            }
-                            Navigator.pop(context);
-
-                             */
-                          } else {
-                            this.setState(() {
-                              this._error = this.isSubmitPicture ? "Please upload a photo" : "Please upload a photo or fill in the text field";
-                            });
-                          }
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10.0, vertical: 8.0),
-                          child: Text(
-                            this.buttonText,
-                            style: TextStyle(
-                              fontSize: 30,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                ],
-              ),
-            ),
-          ),
+        child: Center(
+          child: kIsWeb ? SizedBox(
+            // color: colorAppBase,
+            width: this.uploadAreaSize,
+            child: this._createMainWidget(),
+          ) : OrientationBuilder(builder: (context, orientation) {
+            return orientation == Orientation.portrait ? this._createMainWidget() : SizedBox(
+              width: this.uploadAreaSize + 200,
+              child: this._createMainWidget(),
+            );
+          }),
         ),
       ),
     );
