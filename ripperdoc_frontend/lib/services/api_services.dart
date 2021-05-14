@@ -9,7 +9,12 @@ import 'package:ripperdoc_frontend/shared/constants.dart';
 /// base64String: the image bytes string encoded in Base64 format
 Future<http.Response> postImage(String userID, String base64String) {
   return http.post(
-    Uri.http(domainName, "$backendSubdomain/$userID"),
+    Uri(
+      scheme: "http",
+      host: domainName,
+      port: 5000,
+      path: "/$backendSubdomain/$userID"
+    ),
     headers: <String, String> {
       'Content-Type' : 'application/json; charset=UTF-8'
     },
@@ -23,5 +28,10 @@ Future<http.Response> postImage(String userID, String base64String) {
 ///
 /// userID; the user id from firebase
 Future<http.Response> getLogoLabel(String userID) {
-  return http.get(Uri.http(domainName, "$backendSubdomain/$userID"));
+  return http.get(Uri(
+      scheme: "http",
+      host: domainName,
+      port: 5000,
+      path: "/$backendSubdomain/$userID",
+  ));
 }
