@@ -1,10 +1,12 @@
 version: "2"
 services:
     serving:
+        container_name: ripperdoc-serving
         image: giantsweetroll/ripperdoc:serving
         ports: 
             - 8501:8501
     backend:
+        container_name: ripperdoc-backend
         image: giantsweetroll/ripperdoc:backend
         ports: 
             - 5000:5000
