@@ -7,7 +7,7 @@ This project makes use of Docker for containerization as well as Docker Compose.
 There are two ways to start the containers (Docker Compose or Docker run command):
 
 ### Docker Compose
-1. Clone this repository at the `main` branch
+1. Clone this repository at the `python-backend` branch
 2. Navigate to `ripperdoc-backend` folder an open a terminal in that location
 3. In the terminal, type `docker compose up` and hit enter. This should start all of the necessary containers. The backend container service will be available at port `5000` while the serving container service will be available at port `8501`
 
