@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 
-final String domainName = "127.0.0.0";
+final String domainName = "localhost:5000";
 final String backendSubdomain = "api-backend";
 
 const Color colorAppBase = Color.fromRGBO(203, 222, 192, 1.0);
