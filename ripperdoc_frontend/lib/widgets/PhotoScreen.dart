@@ -284,21 +284,31 @@ class _PhotoScreenState extends State<PhotoScreen> {
                         this._error = "";
                       });
                       this._showLoading(context);
-                      // TODO: Send image as base64 string to backend service
+
                       // Convert image to base 64 string
                       Uint8List bytes = await this.imageFile.readAsBytes();
                       String base64String = base64.encode(bytes);
 
                       // Post request to backend
-                      Response r = await postImage("1", base64String);    // TODO: change ID according to cloud firestore ID
-                      if (r.statusCode != 200) {
-                        this.setState(() {
-                          this._error = "Unable to process image due to an error (${r.statusCode})";
-                        });
-                      } else {
-                        print(r.body);
+                      try {
+                        Response r = await postImage("1", base64String);    // TODO: change ID according to cloud firestore ID
+                        if (r.statusCode != 200) {
+                          this.setState(() {
+                            this._error = "Unable to process image due to an error (${r.statusCode})";
+                          });
+                        } else {
+                          final body = json.decode(r.body);
+                          String logo = body['result'];
+                          print(logo);
+                          String query = "$logo repair shop";
+                          // TODO: use this to query for repair service
+                        }
+                      } catch (e, stacktrace) {
+                        print(e);
                       }
-                      Navigator.pop(context);
+                      finally {
+                        Navigator.pop(context);
+                      }
                     } else if (!this.isSubmitPicture && this._formKey.currentState.validate()) {
                       // TODO: perform google search based on user input
                       String query = "${this.textEditingController.text} repair shop";    // TODO: change as needed
