@@ -1,5 +1,6 @@
 from flask import Flask, request
 from flask_restx import Resource, Api, fields
+from flask_cors import CORS
 
 import constants
 import numpy as np
@@ -12,6 +13,7 @@ from PIL import Image
 ai_results = {}     # Dictionary to store the output of the AI
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app = app,
             version = "1.0",
             title = "RipperDoc API Documentation",

@@ -11,6 +11,7 @@ RUN pip install flask-restx
 # RUN pip install matplotlib
 RUN pip install tensorflow
 RUN pip install Pillow
+RUN pip install flask-cors
 # RUN pip install opencv-python
 
 EXPOSE 5000
