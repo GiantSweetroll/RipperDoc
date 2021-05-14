@@ -1,6 +1,8 @@
 version : "2"
 services:
     docker:
+        container_name: jenkins-docker
+        privileged: true
         image: docker:dind
         environment:
             - DOCKER_TLS_CERTDIR=/certs
@@ -9,9 +11,10 @@ services:
             - jenkins-data:/var/jenkins_home
         networks:
             jenkins-network:
-                aliases:
+                aliases: 
                     - docker
     jenkins:
+        container_name: ripperdoc-jenkins
         image: jenkins/jenkins:lts-jdk11
         environment:
             - DOCKER_HOST=tcp://docker:2376
