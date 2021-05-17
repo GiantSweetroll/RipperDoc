@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class LocationScreen extends StatefulWidget {
 
@@ -21,33 +22,56 @@ class _LocationScreenState extends State<LocationScreen> {
   // Constructor
   _LocationScreenState(this.searchKeyword);
 
-  // Overridden Methods
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(
-          flex: 1,
-          // TODO: replace this with google maps widget
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.amber,
+  // Methods
+  List<Widget> getMainWidgets() {
+    return [
+      Expanded(
+        flex: 2,
+        // TODO: replace this with google maps widget
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.amber,
+          ),
+          child: Center(
+            child: Text(
+              "Google Maps goes here",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 30,
+              ),
             ),
           ),
         ),
-        Expanded(
+      ),
+      Expanded(
           flex: 1,
           child: ListView.builder(
             itemBuilder: (context, index) {
               // TODO: Replace this with the actual location
               return ListTile(
-                title: Text("Location $index"),
+                title: Text(
+                  "Location $index",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               );
             },
           )
-        )
-      ],
+      )
+    ];
+  }
+
+  // Overridden Methods
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: kIsWeb || MediaQuery.of(context).orientation == Orientation.landscape ? Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: getMainWidgets(),
+      ) : Column(
+        children: getMainWidgets(),
+      ),
     );
   }
 }
