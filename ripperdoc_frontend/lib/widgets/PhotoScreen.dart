@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:ripperdoc_frontend/services/api_services.dart';
 import 'package:ripperdoc_frontend/services/image_picker_service.dart';
 import 'package:ripperdoc_frontend/shared/loading.dart';
+import 'package:ripperdoc_frontend/widgets/LocationScreen.dart';
 
 import '../shared/constants.dart';
 
@@ -301,12 +302,12 @@ class _PhotoScreenState extends State<PhotoScreen> {
                           String logo = body['result'];
                           print(logo);
                           String query = "$logo repair shop";
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LocationScreen(query)));
                           // TODO: use this to query for repair service
                         }
                       } catch (e, stacktrace) {
                         print(e);
-                      }
-                      finally {
+                        print(stacktrace);
                         Navigator.pop(context);
                       }
                     } else if (!this.isSubmitPicture && this._formKey.currentState.validate()) {
@@ -349,20 +350,22 @@ class _PhotoScreenState extends State<PhotoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        decoration: decorationAppBase,
-        child: Center(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Center(
-              child: kIsWeb ? SizedBox(
-                // color: colorAppBase,
-                width: this.uploadAreaSize,
-                child: this._createMainWidget(),
-              ) : MediaQuery.of(context).orientation == Orientation.portrait ? this._createMainWidget() : SizedBox(
-                width: this.uploadAreaSize + 200,
-                child: this._createMainWidget(),
+    return Scaffold(
+      body: SafeArea(
+        child: Container(
+          decoration: decorationAppBase,
+          child: Center(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Center(
+                child: kIsWeb ? SizedBox(
+                  // color: colorAppBase,
+                  width: this.uploadAreaSize,
+                  child: this._createMainWidget(),
+                ) : MediaQuery.of(context).orientation == Orientation.portrait ? this._createMainWidget() : SizedBox(
+                  width: this.uploadAreaSize + 200,
+                  child: this._createMainWidget(),
+                ),
               ),
             ),
           ),

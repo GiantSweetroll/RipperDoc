@@ -9,9 +9,7 @@ void main() {
     theme: ThemeData(
       primarySwatch: Colors.blue,
     ),
-    home: Scaffold(
-      body: PhotoScreen(),
-    ),    // TODO: change this to a wrapper class for cloud firestore
+    home: PhotoScreen(),    // TODO: change this to a wrapper class for cloud firestore
   ));
 }
 class MyApp extends StatelessWidget {
