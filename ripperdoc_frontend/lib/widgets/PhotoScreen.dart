@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+
+import 'package:ripperdoc_frontend/widgets/NavDrawer.dart';
+import 'package:ripperdoc_frontend/widgets/PhotoScreen.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import "package:flutter/material.dart";
@@ -352,6 +355,8 @@ class _PhotoScreenState extends State<PhotoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text("Ripper Doc")),
+      drawer: NavDrawer(),
       body: SafeArea(
         child: Container(
           decoration: decorationAppBase,
