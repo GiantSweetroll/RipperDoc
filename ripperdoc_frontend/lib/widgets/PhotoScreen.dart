@@ -14,6 +14,9 @@ import 'package:ripperdoc_frontend/services/api_services.dart';
 import 'package:ripperdoc_frontend/services/image_picker_service.dart';
 import 'package:ripperdoc_frontend/shared/loading.dart';
 import 'package:ripperdoc_frontend/widgets/LocationScreen.dart';
+import 'package:file_picker/file_picker.dart';
+
+
 
 import '../shared/constants.dart';
 
@@ -25,6 +28,8 @@ class PhotoScreen extends StatefulWidget {
 class _PhotoScreenState extends State<PhotoScreen> {
   //Fields
   PickedFile imageFile;
+  FilePickerResult jpgFile;
+  PlatformFile jpgDetails;
   String instructionText = "Upload an Image", buttonText = "SEARCH";
   final _formKey = GlobalKey<FormState>();
   TextEditingController textEditingController = TextEditingController();
@@ -39,6 +44,8 @@ class _PhotoScreenState extends State<PhotoScreen> {
       this._error = "";
       this.textEditingController.text = "";
       this.imageFile = null;
+      this.jpgFile=null;
+      this.jpgDetails=null;
     });
   }
 
@@ -56,7 +63,11 @@ class _PhotoScreenState extends State<PhotoScreen> {
 
   Future<void> _pickImage() async {
     if (kIsWeb) {
-      this.imageFile = await ImagePickerService.pickImage();
+      this.jpgFile = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg'],
+      );
+      this.jpgDetails = jpgFile.files.first;
     } else {
       ImageSource imageSource;
 
@@ -158,8 +169,8 @@ class _PhotoScreenState extends State<PhotoScreen> {
         shadowColor: Colors.transparent,
         child: Container(
           padding: EdgeInsets.all(5.0),
-          child: kIsWeb ? Image.network(
-            this.imageFile.path,
+          child: kIsWeb ? Image.memory(
+            this.jpgDetails.bytes,
             fit: BoxFit.scaleDown,
           ): Image.file(
             File(this.imageFile.path),
@@ -188,7 +199,8 @@ class _PhotoScreenState extends State<PhotoScreen> {
                 color: this.imageFile == null
                     ? this.uploadImageBoxColor
                     : Colors.transparent,
-                child: this.imageFile == null ?  this._createUploadImageWidget(): this._showImageWidget(),
+                child:
+                this.jpgFile == null && this.imageFile == null ?  this._createUploadImageWidget(): this._showImageWidget(),
               ),
             ),
             SizedBox(
@@ -283,15 +295,24 @@ class _PhotoScreenState extends State<PhotoScreen> {
                 ElevatedButton(
                   onPressed: () async {
                     // Validate input
-                    if (this.isSubmitPicture && this.imageFile != null) {
+                    if (this.isSubmitPicture && this.jpgFile != null ) {
                       this.setState(() {
                         this._error = "";
                       });
                       this._showLoading(context);
 
+                      // Make two version, one for web, one for mobile
+                      Uint8List bytes;
+                      if(this.imageFile ==null){
+                        bytes = await this.jpgDetails.bytes;
+                      }
+                      else{
+                         bytes = await this.imageFile.readAsBytes();
+                      }
                       // Convert image to base 64 string
-                      Uint8List bytes = await this.imageFile.readAsBytes();
                       String base64String = base64.encode(bytes);
+
+
 
                       // Post request to backend
                       try {
@@ -313,7 +334,47 @@ class _PhotoScreenState extends State<PhotoScreen> {
                         print(stacktrace);
                         Navigator.pop(context);
                       }
-                    } else if (!this.isSubmitPicture && this._formKey.currentState.validate()) {
+                    }else if (this.isSubmitPicture && this.imageFile != null ) {
+                      this.setState(() {
+                        this._error = "";
+                      });
+                      this._showLoading(context);
+
+
+                      Uint8List bytes;
+                      if(this.imageFile ==null){
+                        bytes = await this.jpgDetails.bytes;
+                      }
+                      else{
+                        bytes = await this.imageFile.readAsBytes();
+                      }
+                      // Convert image to base 64 string
+                      String base64String = base64.encode(bytes);
+
+
+
+                      // Post request to backend
+                      try {
+                        Response r = await postImage("1", base64String);    // TODO: change ID according to cloud firestore ID
+                        if (r.statusCode != 200) {
+                          this.setState(() {
+                            this._error = "Unable to process image due to an error (${r.statusCode})";
+                          });
+                        } else {
+                          final body = json.decode(r.body);
+                          String logo = body['result'];
+                          print(logo);
+                          String query = "$logo repair shop";
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LocationScreen(query)));
+                          // TODO: use this to query for repair service
+                        }
+                      } catch (e, stacktrace) {
+                        print(e);
+                        print(stacktrace);
+                        Navigator.pop(context);
+                      }
+                    }
+                    else if (!this.isSubmitPicture && this._formKey.currentState.validate()) {
                       // TODO: perform google search based on user input
                       String query = "${this.textEditingController.text} repair shop";    // TODO: change as needed
                     } else{
