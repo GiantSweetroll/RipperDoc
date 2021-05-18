@@ -297,6 +297,7 @@ class _PhotoScreenState extends State<PhotoScreen> {
                           this.setState(() {
                             this._error = "Unable to process image due to an error (${r.statusCode})";
                           });
+                          Navigator.pop(context);
                         } else {
                           final body = json.decode(r.body);
                           String logo = body['result'];
