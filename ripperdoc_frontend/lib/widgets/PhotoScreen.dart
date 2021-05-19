@@ -169,10 +169,8 @@ class _PhotoScreenState extends State<PhotoScreen> {
         shadowColor: Colors.transparent,
         child: Container(
           padding: EdgeInsets.all(5.0),
-          child: kIsWeb ? Image.memory(
-            this.jpgDetails.bytes,
-            fit: BoxFit.scaleDown,
-          ): Image.file(
+          child:
+          kIsWeb ? validateJpg(): Image.file(
             File(this.imageFile.path),
             fit: BoxFit.scaleDown,
           ),
@@ -180,7 +178,25 @@ class _PhotoScreenState extends State<PhotoScreen> {
       ),
     );
   }
-
+  Widget validateJpg() {
+    if(this.jpgDetails.extension == 'jpg'){
+      return Image.memory(this.jpgDetails.bytes,
+      fit: BoxFit.scaleDown,);
+    }
+    else{
+      return  Center(
+        child: Text(
+          "JPG Format Only",
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 32,
+              color: Colors.red
+          ),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+  }
   /// Create the main widget of the screen
   Widget _createMainWidget() {
     return Form(
@@ -200,7 +216,7 @@ class _PhotoScreenState extends State<PhotoScreen> {
                     ? this.uploadImageBoxColor
                     : Colors.transparent,
                 child:
-                this.jpgFile == null && this.imageFile == null ?  this._createUploadImageWidget(): this._showImageWidget(),
+                this.jpgFile == null && this.imageFile == null?  this._createUploadImageWidget(): this._showImageWidget(),
               ),
             ),
             SizedBox(
@@ -295,7 +311,7 @@ class _PhotoScreenState extends State<PhotoScreen> {
                 ElevatedButton(
                   onPressed: () async {
                     // Validate input
-                    if (this.isSubmitPicture && this.jpgFile != null ) {
+                    if (this.isSubmitPicture && this.jpgDetails.extension == 'jpg' ) {
                       this.setState(() {
                         this._error = "";
                       });
@@ -374,6 +390,11 @@ class _PhotoScreenState extends State<PhotoScreen> {
                         print(stacktrace);
                         Navigator.pop(context);
                       }
+                    }
+                    else if(this.jpgDetails.extension != 'jpg'){
+                      this.setState(() {
+                        this._error = this.isSubmitPicture ? "JPG format only" : "JPG format only";
+                      });
                     }
                     else if (!this.isSubmitPicture && this._formKey.currentState.validate()) {
                       // TODO: perform google search based on user input
