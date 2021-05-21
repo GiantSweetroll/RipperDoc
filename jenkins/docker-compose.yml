@@ -9,6 +9,10 @@ services:
         volumes:
             - jenkins-docker-certs:/certs/client
             - jenkins-data:/var/jenkins_home
+
+        ports:
+            - 2376:2376
+
         networks:
             jenkins-network:
                 aliases: 
@@ -26,15 +30,20 @@ services:
         networks:
             - jenkins-network
         ports:
-            - 80:8080
-            - 50000:50000
+            - 8080:8080
         depends_on:
             - docker
 volumes:
     jenkins-data:
-        driver: local
+        driver: azure_file
+        driver_opts:
+            share_name: myfileshare
+            storage_account_name: jenkinsdata
     jenkins-docker-certs:
-        driver: local
+        driver: azure_file
+        driver_opts:
+            share_name: myfileshare
+            storage_account_name: jenkinsdockercerts
 networks:
     jenkins-network:
         driver: bridge
