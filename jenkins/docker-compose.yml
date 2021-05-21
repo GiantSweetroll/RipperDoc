@@ -3,7 +3,7 @@ services:
     docker:
         container_name: jenkins-docker
         privileged: true
-        image: docker:dind
+        image: ripperdocjenkins.azurecr.io/docker
         environment:
             - DOCKER_TLS_CERTDIR=/certs
         volumes:
@@ -15,7 +15,7 @@ services:
                     - docker
     jenkins:
         container_name: ripperdoc-jenkins
-        image: jenkins/jenkins:lts-jdk11
+        image: ripperdocjenkins.azurecr.io/jenkins
         environment:
             - DOCKER_HOST=tcp://docker:2376
             - DOCKER_CERT_PATH=/certs/client
@@ -26,7 +26,7 @@ services:
         networks:
             - jenkins-network
         ports:
-            - 9080:8080
+            - 80:8080
             - 50000:50000
         depends_on:
             - docker
