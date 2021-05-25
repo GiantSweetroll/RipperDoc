@@ -3,7 +3,7 @@ services:
     docker:
         container_name: jenkins-docker
         privileged: true
-        image: ripperdocjenkins.azurecr.io/docker
+        image: docker:dind
         environment:
             - DOCKER_TLS_CERTDIR=/certs
         volumes:
@@ -19,7 +19,7 @@ services:
                     - docker
     jenkins:
         container_name: ripperdoc-jenkins
-        image: ripperdocjenkins.azurecr.io/jenkins
+        image: jenkins/jenkins:lts-jdk11
         environment:
             - DOCKER_HOST=tcp://docker:2376
             - DOCKER_CERT_PATH=/certs/client
@@ -29,8 +29,10 @@ services:
             - jenkins-docker-certs:/certs/client:ro
         networks:
             - jenkins-network
+        domainname: "ripperdoc-jenkins"
         ports:
             - 8080:8080
+            - 50000:50000
         depends_on:
             - docker
 volumes:
@@ -38,12 +40,12 @@ volumes:
         driver: azure_file
         driver_opts:
             share_name: myfileshare
-            storage_account_name: jenkinsdata
+            storage_account_name: ripperdocstorage
     jenkins-docker-certs:
         driver: azure_file
         driver_opts:
             share_name: myfileshare
-            storage_account_name: jenkinsdockercerts
+            storage_account_name: ripperdocstorage
 networks:
     jenkins-network:
         driver: bridge
