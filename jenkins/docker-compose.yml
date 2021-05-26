@@ -9,17 +9,17 @@ services:
         volumes:
             - jenkins-docker-certs:/certs/client
             - jenkins-data:/var/jenkins_home
-
-        ports:
+        ports: 
             - 2376:2376
-
         networks:
             jenkins-network:
                 aliases: 
                     - docker
     jenkins:
         container_name: ripperdoc-jenkins
-        image: jenkins/jenkins:lts-jdk11
+        build: .
+        # image: jenkins/jenkinsdocker:lts-jdk11
+        image: giantsweetroll/ripperdoc:jenkins
         environment:
             - DOCKER_HOST=tcp://docker:2376
             - DOCKER_CERT_PATH=/certs/client
@@ -29,23 +29,16 @@ services:
             - jenkins-docker-certs:/certs/client:ro
         networks:
             - jenkins-network
-        domainname: "ripperdoc-jenkins"
         ports:
-            - 8080:8080
+            - 9080:8080
             - 50000:50000
         depends_on:
             - docker
 volumes:
     jenkins-data:
-        driver: azure_file
-        driver_opts:
-            share_name: myfileshare
-            storage_account_name: ripperdocstorage
+        driver: local
     jenkins-docker-certs:
-        driver: azure_file
-        driver_opts:
-            share_name: myfileshare
-            storage_account_name: ripperdocstorage
+        driver: local
 networks:
     jenkins-network:
         driver: bridge
