@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:ripperdoc_frontend/widgets/PhotoScreen.dart';
+import 'package:ripperdoc_frontend/widgets/HistoryScreen.dart';
+import 'package:ripperdoc_frontend/main.dart';
+
 
 class NavDrawer extends StatelessWidget {
   @override
@@ -29,14 +33,12 @@ class NavDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.home),
-            title: Text('Home'),
-            onTap: () => {},
-          ),
-          ListTile(
             leading: Icon(Icons.history),
             title: Text('History'),
-            onTap: () => {},
+            onTap: () => {
+              Navigator.of(context).pop(),
+              Navigator.pushNamed(context, '/history')
+            },
           ),
           ListTile(
             leading: Icon(Icons.logout),

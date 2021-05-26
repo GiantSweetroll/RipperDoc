@@ -1,4 +1,8 @@
+
+
 import 'package:flutter/material.dart';
+import 'package:ripperdoc_frontend/widgets/HistoryScreen.dart';
+import 'package:ripperdoc_frontend/widgets/LocationScreen.dart';
 
 import 'package:ripperdoc_frontend/widgets/NavDrawer.dart';
 import 'package:ripperdoc_frontend/widgets/PhotoScreen.dart';
@@ -9,7 +13,11 @@ void main() {
     theme: ThemeData(
       primarySwatch: Colors.blue,
     ),
-    home: PhotoScreen(),    // TODO: change this to a wrapper class for cloud firestore
+    initialRoute: '/home', // TODO: change this to a wrapper class for cloud firestore
+    routes: {
+      '/home': (context) => PhotoScreen(),
+      '/history': (context) => HistoryScreen(),
+    },
   ));
 }
 class MyApp extends StatelessWidget {

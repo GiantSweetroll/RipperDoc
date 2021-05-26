@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:ripperdoc_frontend/widgets/NavDrawer.dart';
 
 class LocationScreen extends StatefulWidget {
 
@@ -66,6 +67,7 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text("Ripper Doc")),
       body: kIsWeb || MediaQuery.of(context).orientation == Orientation.landscape ? Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: getMainWidgets(),

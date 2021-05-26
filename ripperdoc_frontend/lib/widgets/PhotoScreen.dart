@@ -352,7 +352,7 @@ class _PhotoScreenState extends State<PhotoScreen> {
                         print(stacktrace);
                         Navigator.pop(context);
                       }
-                    }else if (this.isSubmitPicture && this.imageFile != null ) { //Mobile Version Submit Button
+                    }else if (this.isSubmitPicture && this.imageFile != null ) { //Mobile  Version Submit Button
                       this.setState(() {
                         this._error = "";
                       });
