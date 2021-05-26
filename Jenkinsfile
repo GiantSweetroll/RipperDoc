@@ -7,20 +7,16 @@ pipeline {
                 echo 'building the application....'
             }
         }
-    }
 
-    stages {
         stage("test") {
             steps {
                 echo 'testing the application...'
             }
         }
-    }
 
-    stages {
         stage("deploy") {
             steps {
-                echo 'deploying the application'
+                echo 'deploying the application...'
             }
         }
     }
