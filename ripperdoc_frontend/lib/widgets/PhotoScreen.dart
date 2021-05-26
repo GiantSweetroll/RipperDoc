@@ -308,16 +308,18 @@ class _PhotoScreenState extends State<PhotoScreen> {
                   ),
                 ),
                 SizedBox(width: 20,),
+                // Make two version, one for web, one for mobile
                 ElevatedButton(
                   onPressed: () async {
                     // Validate input
-                    if (this.isSubmitPicture && this.jpgDetails.extension == 'jpg' ) {
+
+                    if (this.jpgFile != null && this.jpgDetails.extension == "jpg" ) {  //Web Version Submit Button
                       this.setState(() {
                         this._error = "";
                       });
                       this._showLoading(context);
 
-                      // Make two version, one for web, one for mobile
+
                       Uint8List bytes;
                       if(this.imageFile ==null){
                         bytes = await this.jpgDetails.bytes;
@@ -350,7 +352,7 @@ class _PhotoScreenState extends State<PhotoScreen> {
                         print(stacktrace);
                         Navigator.pop(context);
                       }
-                    }else if (this.isSubmitPicture && this.imageFile != null ) {
+                    }else if (this.isSubmitPicture && this.imageFile != null ) { //Mobile Version Submit Button
                       this.setState(() {
                         this._error = "";
                       });
@@ -391,7 +393,7 @@ class _PhotoScreenState extends State<PhotoScreen> {
                         Navigator.pop(context);
                       }
                     }
-                    else if(this.jpgDetails.extension != 'jpg'){
+                    else if(this.jpgFile != null && this.jpgDetails.extension != "jpg"){
                       this.setState(() {
                         this._error = this.isSubmitPicture ? "JPG format only" : "JPG format only";
                       });
