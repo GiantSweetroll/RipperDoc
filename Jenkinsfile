@@ -32,12 +32,12 @@ pipeline {
             steps {
                 echo 'Running docker image...'
                 script {
-                    sh 'docker container ls'
+                    sh 'docker ps'
                     dockerImage.inside ('--entrypoint "" -p 5000:5000 --name ripperdoc-backend --rm') {
                         // Test container here
                         sh 'python --version'
-                        sh 'python ripperdoc-backend/test.py'
                     }
+                    sh 'docker ps'
                 }
                 echo 'Docker image ran and was tested successfully'
             }
