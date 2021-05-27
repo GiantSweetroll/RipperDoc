@@ -60,9 +60,3 @@ def from_curl(image_bytes:str):
 # serving_container = docker_client.containers.get("ripperdoc-backend_serving_1")
 # ip = serving_container.attrs['NetworkSettings']['Networks']['ripperdoc-backend_default']['IPAddress']
 # print(ip)
-
-print("Testing GET...")
-backend_domain = request.remote_addr
-response = requests.get(backend_domain)
-print("Response Code:", response.status_code)
-print("GET successful")
