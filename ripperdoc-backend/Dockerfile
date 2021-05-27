@@ -3,6 +3,7 @@ FROM python:3
 RUN apt-get update
 RUN apt-get upgrade
 RUN apt-get install curl
+RUN Y
 # RUN apt-get install tensorflow-model-server
 # RUN apt-get install -y libglib2.0-0 libsm6 libxrender1 libxext6 libgl1-mesa-glx
 
