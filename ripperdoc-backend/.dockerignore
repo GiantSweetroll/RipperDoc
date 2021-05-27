@@ -1,0 +1,12 @@
+__pycache__
+.vscode
+ai
+documents
+datasets
+dataset_collector.py
+neural_network.py
+model_arch.py
+test.py
+train_ai.py
+methods.py
+file_operations.py
