@@ -1,7 +1,8 @@
 FROM tensorflow/serving
 
-RUN apt-get update
-RUN apt-get install curl
+RUN apt-get -y update
+RUN apt-get -y upgrade
+RUN apt-get -y install curl
 
 ENV MODEL_NAME=ripperdoc
 
