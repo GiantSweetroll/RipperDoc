@@ -35,7 +35,6 @@ pipeline {
                     sh 'docker container ls'
                     dockerImage.inside ('--entrypoint "" -p 5000:5000 --name ripperdoc-backend --rm') {
                         // Test container here
-                        sh 'ls'
                         sh 'python --version'
                     }
                 }
