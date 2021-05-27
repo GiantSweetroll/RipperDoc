@@ -33,7 +33,7 @@ pipeline {
                 echo 'Running docker image...'
                 script {
                     sh 'docker ps'
-                    dockerImage.inside ('--entrypoint "" -p 5000:5000 --name ripperdoc-backend --rm') {
+                    dockerImage.inside ('--entrypoint "" -p 5000:5000 --name ripperdoc-backend') {
                         // Test container here
                         sh 'python --version'
                     }
