@@ -6,6 +6,7 @@ import constants
 import base64
 import io
 from PIL import Image
+from flask import request
 # import docker
 
 def save_base64():
@@ -60,4 +61,8 @@ def from_curl(image_bytes:str):
 # ip = serving_container.attrs['NetworkSettings']['Networks']['ripperdoc-backend_default']['IPAddress']
 # print(ip)
 
-print("initial testing woohoo")
+print("Testing GET...")
+backend_domain = request.remote_addr
+response = requests.get(backend_domain)
+print("Response Code:", response.status_code)
+print("GET successful")
