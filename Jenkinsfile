@@ -36,6 +36,7 @@ pipeline {
                     dockerImage.inside ('--entrypoint "" -p 5000:5000 --name ripperdoc-backend') {
                         // Test container here
                         sh 'python --version'
+                        sh 'curl --version'
                     }
                     sh 'docker ps'
                 }
