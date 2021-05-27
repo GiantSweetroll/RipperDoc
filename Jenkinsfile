@@ -8,35 +8,40 @@ pipeline {
     }
 
     stages {
-        stage("build") {
+        stage("Build Docker image") {
             steps {
-                echo 'building the application....'
-            }
-        }
-
-        stage("test") {
-            steps {
-                echo 'testing the application...'
+                echo 'building docker image...'
+                dir ("ripperdoc-backend") {
+                    script {
+                        dockerImage = docker.build registry + ':backend'
+                    }
+                }
+                echo 'docker image built!'
             }
         }
         
-        stage("Build Docker image") {
+        stage("Test Image") {
             steps {
-                dir ("ripperdoc-backend") {
-                    script {
-                        dockerImage = docker.build registry
+                echo 'Running docker image...'
+                script {
+                    dockerImage.inside ('-p 5000:5000 --name ripperdoc-backend --rm') {
+                        // Test container here
+                        sh 'python --version'
                     }
                 }
+                echo 'Docker image ran and was tested successfully'
             }
         }
         
         stage("Uploading Image") {
             steps {
+                echo 'Pushing image to docker hub...'
                 script {
                     docker.withRegistry('', registryCredential) {
                         dockerImage.push()
                     }
                 }
+                echo 'Docker image successfully pushed to Docker Hub!'
             }
         }
 
