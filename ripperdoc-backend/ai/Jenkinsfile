@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+
+    environment {
+        registry = "giantsweetroll/ripperdoc"
+        registryCredential = 'dockerhub_token'
+        dockerImage = ''
+    }
+
+    stages {
+        stage("Clone Repo") {
+            steps {
+                echo 'Cloning repo from GitLab...'
+                git branch: 'main', url: 'https://gitlab.com/giantsweetroll/ripperdoc'
+                echo 'Repo cloned!'
+            }
+        }
+
+        stage("Build Docker image") {
+            steps {
+                echo 'building docker image...'
+                script {
+                    dockerImage = docker.build registry + ':serving'
+                }
+                echo 'docker image built!'
+            }
+        }
+        
+        stage('Stop Container') {
+         steps {
+            echo 'Stop container if running'
+            sh 'docker ps -f name=ripperdoc-serving -q | xargs --no-run-if-empty docker container stop'
+            sh 'docker container ls -a -fname=ripperdoc-serving -q | xargs -r docker container rm'
+         }
+       }
+        
+        stage("Run and Test Image") {
+            steps {
+                echo 'Running docker image...'
+                script {
+                    sh 'docker container ls'
+                    dockerImage.inside ('--entrypoint "" -p 8501:8501 --name ripperdoc-serving --rm') {
+                        // Test container here
+                    }
+                }
+                echo 'Docker image ran and was tested successfully'
+            }
+        }
+        
+        stage("Uploading Image") {
+            steps {
+                echo 'Pushing image to docker hub...'
+                script {
+                    docker.withRegistry('', registryCredential) {
+                        dockerImage.push()
+                    }
+                }
+                echo 'Docker image successfully pushed to Docker Hub!'
+            }
+        }
+
+        stage("deploy") {
+            steps {
+                echo 'deploying the application...'
+            }
+        }
+    }
+}
