@@ -20,11 +20,20 @@ pipeline {
             }
         }
         
-        stage("Test Image") {
+        stage('Stop Container') {
+         steps {
+            echo 'Stop container if running'
+            sh 'docker ps -f name=ripperdoc-backend -q | xargs --no-run-if-empty docker container stop'
+            sh 'docker container ls -a -fname=ripperdoc-backend -q | xargs -r docker container rm'
+         }
+       }
+        
+        stage("Run and Test Image") {
             steps {
                 echo 'Running docker image...'
                 script {
-                    dockerImage.inside ('-p 5000:5000 --name ripperdoc-backend --rm') {
+                    sh 'docker container ls'
+                    dockerImage.inside ('--entrypoint "" -p 5000:5000 --name ripperdoc-backend --rm') {
                         // Test container here
                         sh 'python --version'
                     }
