@@ -19,7 +19,7 @@ XCEPTION = tf.keras.applications.Xception(
 )
 
 def custom_model(input_shape:(), class_count:int):
-    model = tf.keras.models.Sequential()
+    model = tf.keras.models.Sequential(name='ripperdoc_custom')
     model.add(layers.Conv2D(16, kernel_size=(5, 5), activation='relu', input_shape=input_shape))
     model.add(layers.Conv2D(32, kernel_size=(5, 5),activation='relu'))
     model.add(layers.Conv2D(64, (5, 5), activation='relu'))
