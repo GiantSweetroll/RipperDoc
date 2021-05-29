@@ -6,7 +6,6 @@ services:
         ports: 
             - 8501:8501
     backend:
-        build: .
         container_name: ripperdoc-backend
         image: giantsweetroll/ripperdoc:backend
         ports: 
