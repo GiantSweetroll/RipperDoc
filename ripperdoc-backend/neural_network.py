@@ -9,7 +9,11 @@ import datetime
 class NeuralNetwork():
     
     #Constructor
-    def __init__(self, model = None):
+    def __init__(self, 
+        model = None,
+        tensorboard_file_name:str = datetime.datetime.now().strftime("%Y%m%d-%H%M%S"),
+        csv_file_name:str = datetime.datetime.now().strftime("%Y%m%d-%H%M%S"),
+    ):
         """A class to represent the neural network object"""
         if model == None:
             # Use Xception model
@@ -28,7 +32,14 @@ class NeuralNetwork():
 
             model.compile(loss='categorical_crossentropy', optimizer=tf.keras.optimizers.Adam(learning_rate=lr_schedule), metrics=['accuracy'])  # Compile the model
             print("Model compiled!")
+        elif not model._is_compiled:
+            print("Model was not compiled, compiling...")
+            model.compile(loss='categorical_crossentropy', optimizer=tf.keras.optimizers.Adam(learning_rate=lr_schedule), metrics=['accuracy'])  # Compile the model
+            print("Model compiled!")
+
         self.__model = model
+        self.__tensorboard_file_name = tensorboard_file_name
+        self.__csv_file_name = csv_file_name
     
     #Setters and Getters
     def get_model(self):
@@ -67,7 +78,7 @@ class NeuralNetwork():
         print('Training and validation images loaded.')
         
         # Prepare tensorboard
-        log_dir = "L:/For Machine Learning/Project/RipperDoc/models/logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        log_dir = "L:/For Machine Learning/Project/RipperDoc/models/logs/fit/" + self.__tensorboard_file_name
         tensorboard_callback = tf.keras.callbacks.TensorBoard(
             log_dir=log_dir, 
             histogram_freq=1,
@@ -98,7 +109,7 @@ class NeuralNetwork():
             save_weights_only=False
         )
         csv_logger = tf.keras.callbacks.CSVLogger(
-            'L:/For Machine Learning/Project/RipperDoc/models/training-' + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + '.csv',
+            'L:/For Machine Learning/Project/RipperDoc/models/' + self.__csv_file_name + '.csv',
             append=False
         )
 
