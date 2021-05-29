@@ -4,6 +4,8 @@ import constants
 import tensorflow as tf
 import methods
 import io
+import glob
+import os
 import base64
 from io import BytesIO
 
@@ -92,3 +94,25 @@ def convert_base64_to_image(base64str:str):
     im_file = BytesIO(base64_bytes)
 
     return Image.open(im_file)
+
+def convert_all_png_into_jpg(directory:str):
+    png_images = glob.glob(directory + '/*.png')
+    print('found', len(png_images), ' png images...')
+    for png_fn in png_images:
+        print(png_fn)
+        img = load_image(png_fn)
+        img = convert_png_to_jpg(img)
+        img.save(png_fn[:len(png_fn)-4] + '.jpg')
+
+def delete_all_png(directory:str):
+    png_images = glob.glob(directory + '/*.png')
+    for png_fn in png_images:
+        os.remove(png_fn)
+
+def convert_all_image_from_dataset_to_jpg(directory: str):
+    classes = glob.glob(directory + '/*')
+    for c in classes:
+        convert_all_png_into_jpg(c)
+        delete_all_png(c)
+
+# convert_all_image_from_dataset_to_jpg("L:/For Machine Learning/Project/RipperDoc/dataset")
