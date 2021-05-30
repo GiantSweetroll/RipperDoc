@@ -4,16 +4,15 @@ import file_operations as io
 import os
 import constants
 import file_operations
-import datetime
 import model_arch as m
 import tensorflow.keras as keras
 
 # Training params
-batch_sizes: list = [1, 2, 4, 8, 16, 32, 64]
+batch_sizes: list = [32, 64, 128, 256]
 initial_learning_rates:list = [1.0, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.000001]
 loss_functions = ["categorical_crossentropy", "sparse_categorical_crossentropy", "kullback_leibler_divergence"]
 epochs = 50
-trials = 5
+trials = 1
 
 # Helper functions
 def generate_tensorboard_filename(
@@ -24,7 +23,7 @@ def generate_tensorboard_filename(
     batch_size:int,
     trial:int,
 ):
-    return datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + " - " + model_name + " loss-" + loss_function + " optimizer-" + optimizer_function + " lr-" + str(initial_learning_rate) + " batch_size-" + str(batch_size) + " t" + str(trial)
+    return model_name + " loss-" + loss_function + " optimizer-" + optimizer_function + " lr-" + str(initial_learning_rate) + " batch_size-" + str(batch_size) + " t" + str(trial)
 
 def generate_optimizers_list(lr):
     ls = []
@@ -68,15 +67,20 @@ def train(model_arch, model_name:str) :
                         csv_filename = model_name + "/" + generate_tensorboard_filename(model_name, loss, optimizer_name, lr, batch_size, i)
                         model.compile(optimizer, loss, metrics=["accuracy"])
 
-                        # Train
-                        ai = NeuralNetwork(model=model, tensorboard_file_name=tensorboard_filename, csv_file_name=csv_filename)
-                        ai.train(batch_size=batch_size, epochs=epochs,)
-                        ai.save(constants.model_loc + model_name + "/" + model_name + " loss-" + loss + " optimizer-" + optimizer_name + " lr-" + str(lr) + " batch_size-" + str(batch_size) + " t" + str(i))
+                        try:
+                            
+                            if not os.path.exists('L:/For Machine Learning/Project/RipperDoc/models/' + csv_filename):
+                                # Train
+                                ai = NeuralNetwork(model=model, tensorboard_file_name=tensorboard_filename, csv_file_name=csv_filename)
+                                ai.train(batch_size=batch_size, epochs=epochs,)
+                                ai.save(constants.model_loc + model_name + "/" + model_name + " loss-" + loss + " optimizer-" + optimizer_name + " lr-" + str(lr) + " batch_size-" + str(batch_size) + " t" + str(i))
+                        except:
+                            print("Could not perform training of", tensorboard_filename, 'due to an error')
     print(model_name + " completed!")
 
 # MobileNetV2
 train(m.MOBILENETV2, "MobileNetV2")
-print("")
+print("") 
 
 # Logo Recognition Arch from Paper
 train(m.logo_recog(len(constants.labels)), "Logo Recog")
