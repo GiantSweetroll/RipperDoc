@@ -8,6 +8,19 @@ RUN apt-key fingerprint 0EBFCD88
 RUN add-apt-repository \
        "deb [arch=amd64] https://download.docker.com/linux/debian \
        $(lsb_release -cs) stable"
-RUN apt-get update && apt-get install -y docker-ce-cli
+
+# Install npm
+RUN apt-get install -y \
+    software-properties-common \
+    npm
+RUN npm install npm@latest -g && \
+    npm install n -g && \
+    n latest
+
+# Install firebase
+RUN npm install -g firebase-tools
+
+# Install Docker
+RUN apt-get update && apt-get install -y docker.io
 USER jenkins
 RUN jenkins-plugin-cli --plugins "blueocean:1.24.6 docker-workflow:1.26"
