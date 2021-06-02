@@ -21,6 +21,15 @@ RUN npm install npm@latest -g && \
 RUN npm install -g firebase-tools
 
 # Install Docker
-RUN apt-get update && apt-get install -y docker.io
+# RUN apt-get update && apt-get install -y docker.io
+ARG DOCKER_CLIENT=docker-17.06.2-ce.tgz
+
+RUN cd /tmp/ && curl -sSL -O https://download.docker.com/linux/static/stable/x86_64/${DOCKER_CLIENT} \
+&& tar zxf ${DOCKER_CLIENT} \
+&& mkdir -p /usr/local/bin \
+&& mv ./docker/docker /usr/local/bin \
+&& chmod +x /usr/local/bin/docker \
+&& rm -rf /tmp/*
+
 USER jenkins
 RUN jenkins-plugin-cli --plugins "blueocean:1.24.6 docker-workflow:1.26"
