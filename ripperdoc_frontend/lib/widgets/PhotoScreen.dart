@@ -14,6 +14,8 @@ import 'package:ripperdoc_frontend/services/api_services.dart';
 import 'package:ripperdoc_frontend/services/image_picker_service.dart';
 import 'package:ripperdoc_frontend/shared/loading.dart';
 import 'package:ripperdoc_frontend/widgets/LocationScreen.dart';
+import 'package:image/image.dart' as conv ;
+import 'package:ripperdoc_frontend/services/convertJpg.dart' as something;
 
 import '../shared/constants.dart';
 
@@ -289,9 +291,11 @@ class _PhotoScreenState extends State<PhotoScreen> {
                       });
                       this._showLoading(context);
 
-                      // Convert image to base 64 string
-                      Uint8List bytes = await this.imageFile.readAsBytes();
-                      String base64String = base64.encode(bytes);
+                      //Convert To JPG
+                      var decodeImage = conv.decodeImage(await this.imageFile.readAsBytes());
+                      var encodeToJpg = conv.encodeJpg(decodeImage);
+
+                      String base64String = base64.encode(encodeToJpg);
 
                       // Post request to backend
                       try {
