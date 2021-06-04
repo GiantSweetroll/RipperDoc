@@ -1,6 +1,8 @@
 # RipperDoc
 An application to take picture of an item and can identify the nearest repair service shop related to that product.
 
+**NOTE:** this project is no longer being maintained at this repository. Please visit its new repository at https://gitlab.com/giantsweetroll/ripperdoc
+
 ## Docker Containers
 This project makes use of Docker for containerization as well as Docker Compose. The Docker images for this project are available at [Docker Hub](https://hub.docker.com/r/giantsweetroll/ripperdoc). Docker needs to be installed in your system in order to use the images.
 
